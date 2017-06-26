@@ -6,7 +6,9 @@ var version = EnvironmentVariable ("APPVEYOR_BUILD_VERSION") ?? Argument("versio
 var libraries = new Dictionary<string, string> {
  	{ "./src/FileUploader.sln", "Any" },
 };
-
+var samples = new Dictionary<string, string> {
+	{ "./samples/FileUploaderSample/FileUploader.sln", "Win" },
+};
 
 var BuildAction = new Action<Dictionary<string, string>> (solutions =>
 {

@@ -5,9 +5,6 @@ Simple cross platform plugin to upload files.
 * Available on NuGet: http://www.nuget.org/packages/Plugin.FileUploader [![NuGet](https://img.shields.io/nuget/v/Plugin.FileUploader.svg?label=NuGet)](https://www.nuget.org/packages/Plugin.FileUploader/)
 * Install into your PCL project and Client projects.
 
-Build Status: 
-* [![Build status](https://ci.appveyor.com/api/projects/status/k6l4x6ovp5ysfbar?svg=true)](https://ci.appveyor.com/project/rdelrosario/fileuploaderplugin)
-* CI NuGet Feed: https://ci.appveyor.com/nuget/fileuploaderplugin
 
 **Platform Support**
 
@@ -20,38 +17,83 @@ Build Status:
 
 Call **CrossFileUploader.Current** from any project or PCL to gain access to APIs.
 
+You can upload a file using the file path or bytes.
 
-**FileItem**
+
+**FilePathItem**
 ```csharp
 /// <summary>
 /// Path: File path location.
-/// Name: Name of the file.
+/// FieldName: Request field name for the file to be uploaded
 /// </summary>
-public class FileItem
+public class FilePathItem
 {
     public string Path { get; } 
-    public string Name {get; } 
+    public string FieldName {get; } 
+}
+```
+
+
+**FileBytesItem**
+```csharp
+/// <summary>
+/// FieldName: Request field name for the file to be uploaded
+/// Bytes: File bytes.
+/// Name: Name of the file.
+/// </summary>
+public class FileBytesItem
+{
+    public string Name { get; }
+    public string FieldName { get; }
+    public byte[] Bytes { get; }
 }
 ```
 
 
 **UploadFileAsync**
 ```csharp
-/// <summary>
-/// Upload file
-/// </summary>
-/// <param name="url">Url for file uploading</param>
-/// <param name="fileItem">File item to be uploaded</param>
-/// <param name="token">Authorization token</param>
-/// <param name="parameters">Additional parameters for upload request</param>
-/// <returns>FileUploadResponse</returns>
-Task<FileUploadResponse> UploadFileAsync(string url, FileItem fileItem, string token = null, IDictionary<string, string> parameters = null);
+        /// <summary>
+        /// Upload file using file path
+        /// </summary>
+        /// <param name="url">Url for file uploading</param>
+        /// <param name="fileItem">File path item to be uploaded</param>
+        /// <param name="headers">Request headers</param>
+        /// <param name="parameters">Additional parameters for upload request</param>
+        /// <returns>FileUploadResponse</returns>
+        Task<FileUploadResponse> UploadFileAsync(string url, FilePathItem fileItem, IDictionary<string,string> headers =null,IDictionary < string, string> parameters = null);
+
+        /// <summary>
+        /// Upload file using file bytes
+        /// </summary>
+        /// <param name="url">Url for file uploading</param>
+        /// <param name="fileItem">File bytes item to be uploaded</param>
+        /// <param name="headers">Request headers</param>
+        /// <param name="parameters">Additional parameters for upload request</param>
+        /// <returns>FileUploadResponse</returns>
+        Task<FileUploadResponse> UploadFileAsync(string url, FileBytesItem fileItem, IDictionary<string, string> headers = null, IDictionary<string, string> parameters = null);
 ```
 
 Usage sample:
+
+Uploading from a file path
 ```csharp
 
-  var response = await CrossFileUploader.Current.UploadFileAsync($"<UPLOAD URL HERE>",new FileItem("<FILE NAME HERE>",filePath));
+    CrossFileUploader.Current.UploadFileAsync("<URL HERE>", new FilePathItem("<REQUEST FIELD NAME HERE>","<FILE PATH HERE>"), new Dictionary<string, string>()
+                {
+                   {"<HEADER KEY HERE>" , "<HEADER VALUE HERE>"}
+                }
+    );
+
+```
+
+Uploading from a file bytes
+```csharp
+
+  CrossFileUploader.Current.UploadFileAsync("<URL HERE>", new FileBytesItem("<REQUEST FIELD NAME HERE>","<FILE BYTES HERE>","<FILE NAME HERE>"), new Dictionary<string, string>()
+                {
+                   {"<HEADER KEY HERE>" , "<HEADER VALUE HERE>"}
+                }
+  );
 
 ```
 
@@ -103,7 +145,7 @@ On AppDelegate.cs
      */
     public override void HandleEventsForBackgroundUrl(UIApplication application, string sessionIdentifier, Action completionHandler)
     {
-        FileUploaderImplementation.UrlSessionCompletion = completionHandler;
+        FileUploadManager.UrlSessionCompletion = completionHandler;
     }
 ```
 

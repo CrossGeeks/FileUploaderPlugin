@@ -2,19 +2,19 @@
 <package >
   <metadata minClientVersion="2.8.1">
     <id>Plugin.FileUploader</id>
-    <version>$version$</version>
+    <version>1.0.1</version>
     <title>FileUploader Plugin for Xamarin iOS and Android</title>
     <authors>Rendy Del Rosario</authors>
     <owners>crossgeeks,rdelrosario</owners>
-    <licenseUrl>http://LICENSE_URL_HERE_OR_DELETE_THIS_LINE</licenseUrl>
-    <projectUrl>http://PROJECT_URL_HERE_OR_DELETE_THIS_LINE</projectUrl>
-    <iconUrl>http://ICON_URL_HERE_OR_DELETE_THIS_LINE</iconUrl>
+    <licenseUrl>https://raw.githubusercontent.com/CrossGeeks/FileUploaderPlugin/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/CrossGeeks/FileUploaderPlugin</projectUrl>
+    <iconUrl>https://github.com/CrossGeeks/FileUploaderPlugin/blob/master/art/icon.png?raw=true</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Upload files across Xamarin.iOS and Xamarin.Android</description>
     <summary>Upload files across Xamarin.iOS and Xamarin.Android</summary>
-    <releaseNotes>Summary of changes made in this release of the package.</releaseNotes>
+    <releaseNotes>Support for uploading files on Android and iOS</releaseNotes>
     <copyright>Copyright 2017</copyright>
-    <tags>Tag1 Tag2</tags>
+    <tags>iOS,Android,File uploading</tags>
     <dependencies>
         <group targetFramework="MonoAndroid">
             <dependency id="modernhttpclient" version="2.4.2" />
@@ -22,19 +22,20 @@
     </dependencies>
   </metadata>
   <files>
+     <file src="..\src\Plugin.FileUploader\bin\Release\Plugin.FileUploader.*" target="lib\portable-net45+wp80+win8+wpa81" />
     <!-- Cross-platform reference assemblies -->
-    <file src="src\Plugin.FileUploader\bin\Release\Plugin.FileUploader.dll" target="lib\netstandard1.4\Plugin.FileUploader.dll" />
-    <file src="src\Plugin.FileUploader\bin\Release\Plugin.FileUploader.xml" target="lib\netstandard1.4\Plugin.FileUploader.xml" />
-    <file src="src\Plugin.FileUploader.Abstractions\bin\Release\Plugin.FileUploader.Abstractions.dll" target="lib\netstandard1.4\Plugin.FileUploader.Abstractions.dll" />
-    <file src="src\Plugin.FileUploader.Abstractions\bin\Release\Plugin.FileUploader.Abstractions.xml" target="lib\netstandard1.4\Plugin.FileUploader.Abstractions.xml" />
+    <file src="..\src\Plugin.FileUploader\bin\Release\Plugin.FileUploader.dll" target="lib\netstandard1.4\Plugin.FileUploader.dll" />
+    <file src="..\src\Plugin.FileUploader\bin\Release\Plugin.FileUploader.xml" target="lib\netstandard1.4\Plugin.FileUploader.xml" />
+    <file src="..\src\Plugin.FileUploader.Abstractions\bin\Release\Plugin.FileUploader.Abstractions.dll" target="lib\netstandard1.4\Plugin.FileUploader.Abstractions.dll" />
+    <file src="..\src\Plugin.FileUploader.Abstractions\bin\Release\Plugin.FileUploader.Abstractions.xml" target="lib\netstandard1.4\Plugin.FileUploader.Abstractions.xml" />
 
     <!-- iOS reference assemblies -->
-    <file src="src\Plugin.FileUploader.iOS\bin\Release\Plugin.FileUploader.dll" target="lib\Xamarin.iOS10\Plugin.FileUploader.dll" />
-    <file src="src\Plugin.FileUploader.iOS\bin\Release\Plugin.FileUploader.xml" target="lib\Xamarin.iOS10\Plugin.FileUploader.xml" />
+    <file src="..\src\Plugin.FileUploader.iOS\bin\iPhone\Release\Plugin.FileUploader.dll" target="lib\Xamarin.iOS10\Plugin.FileUploader.dll" />
+    <file src="..\src\Plugin.FileUploader.iOS\bin\iPhone\Release\Plugin.FileUploader.xml" target="lib\Xamarin.iOS10\Plugin.FileUploader.xml" />
 
     <!-- Android reference assemblies -->
-    <file src="src\Plugin.FileUploader.Android\bin\Release\Plugin.FileUploader.dll" target="lib\MonoAndroid10\Plugin.FileUploader.dll" />
-    <file src="src\Plugin.FileUploader.Android\bin\Release\Plugin.FileUploader.xml" target="lib\MonoAndroid10\Plugin.FileUploader.xml" />
+    <file src="..\src\Plugin.FileUploader.Android\bin\Release\Plugin.FileUploader.dll" target="lib\MonoAndroid10\Plugin.FileUploader.dll" />
+    <file src="..\src\Plugin.FileUploader.Android\bin\Release\Plugin.FileUploader.xml" target="lib\MonoAndroid10\Plugin.FileUploader.xml" />
 
   </files>
 </package>
