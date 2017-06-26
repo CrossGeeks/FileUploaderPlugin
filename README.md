@@ -130,7 +130,7 @@ Usage sample:
     System.Diagnostics.Debug.WriteLine($"{response.StatusCode} - {response.Message}");
   };
   
-  CrossFileUploader.Current.UploadFileAsync($"<UPLOAD URL HERE>",new FileItem("<FILE NAME HERE>",filePath));
+  CrossFileUploader.Current.UploadFileAsync($"<UPLOAD URL HERE>",new FileItem("<FIELD NAME HERE>","<FILE PATH HERE>"));
 
 ```
 ### **IMPORTANT**
