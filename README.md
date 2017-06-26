@@ -1,5 +1,5 @@
 ## FileUploader Plugin for Xamarin iOS and Android
-Simple cross platform plugin to upload files.
+Simple cross platform plugin for file multipart uploads.
 
 ### Setup
 * Available on NuGet: http://www.nuget.org/packages/Plugin.FileUploader [![NuGet](https://img.shields.io/nuget/v/Plugin.FileUploader.svg?label=NuGet)](https://www.nuget.org/packages/Plugin.FileUploader/)
