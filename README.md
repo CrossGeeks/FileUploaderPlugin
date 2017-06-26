@@ -11,7 +11,7 @@ Simple cross platform plugin for file multipart uploads.
 |Platform|Version|
 | ------------------- | :------------------: |
 |Xamarin.iOS|iOS 7+|
-|Xamarin.Android|API 10+|
+|Xamarin.Android|API 15+|
 
 ### API Usage
 
