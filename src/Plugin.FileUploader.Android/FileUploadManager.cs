@@ -1,5 +1,4 @@
 using Java.Util.Concurrent;
-using Newtonsoft.Json.Linq;
 using Plugin.FileUploader.Abstractions;
 using OkHttp;
 using System;
