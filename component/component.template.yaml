@@ -1,0 +1,47 @@
+%YAML 1.2
+---
+version: {VERSION}
+name: FileUploader Plugin
+id: FileUploaderPlugin
+publisher: CrossGeeks
+license: License.md
+skip_docs: true
+icons: 
+  - FileUploaderPlugin_128x128.png
+  - FileUploaderPlugin_512x512.png
+publisher-url: http://www.github.com/crossgeeks/FileUploaderPlugin
+is_shell: true
+packages:
+  ios-unified: Plugin.FileUploader, Version={VERSION}
+  android: Plugin.FileUploader, Version={VERSION}
+  winuniversal-10.0: Plugin.FileUploader, Version={VERSION}
+summary: Upload files using multipart request
+details: Details.md
+getting-started: GettingStarted.md
+samples: 
+  - name: FileUploader Samples (iOS, Android, and Windows)
+    path: "../Samples/FileUploaderSample.sln"
+    removeProjects: 
+      - FileUploader.Plugin
+      - FileUploader.Plugin.Abstractions
+      - FileUploader.Plugin.Android
+      - FileUploader.Plugin.iOS
+      - FileUploader.Plugin.UWP
+    installNuGets:
+      - project: FileUploaderSample
+        packages: 
+          - Plugin.FileUploader
+      - project: FileUploaderSample.iOS
+        packages: 
+          - Plugin.FileUploader
+      - project: FileUploaderSample.Droid
+        packages: 
+          - Plugin.FileUploader
+      - project: FileUploaderSample.UWP
+        packages: 
+          - Plugin.FileUploader
+    no_build: true
+    skip_docs: true  
+local-nuget-repo: ../Build/nuget
+no_build: true
+...
