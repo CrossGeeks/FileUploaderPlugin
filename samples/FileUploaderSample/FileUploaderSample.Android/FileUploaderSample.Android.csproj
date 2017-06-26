@@ -72,7 +72,10 @@
       <HintPath>..\..\..\packages\Plugin.CurrentActivity.1.0.1\lib\MonoAndroid10\Plugin.CurrentActivity.dll</HintPath>
     </Reference>
     <Reference Include="Plugin.FileUploader, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\FileUploaderSample\packages\Plugin.FileUploader.1.0.1\lib\MonoAndroid10\Plugin.FileUploader.dll</HintPath>
+      <HintPath>..\FileUploaderSample\packages\Plugin.FileUploader.1.0.3\lib\MonoAndroid10\Plugin.FileUploader.dll</HintPath>
+    </Reference>
+    <Reference Include="Plugin.FileUploader.Abstractions, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\FileUploaderSample\packages\Plugin.FileUploader.1.0.3\lib\MonoAndroid10\Plugin.FileUploader.Abstractions.dll</HintPath>
     </Reference>
     <Reference Include="Plugin.Media, Version=2.6.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\..\packages\Xam.Plugin.Media.2.6.2\lib\MonoAndroid10\Plugin.Media.dll</HintPath>

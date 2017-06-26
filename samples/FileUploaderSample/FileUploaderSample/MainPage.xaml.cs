@@ -141,13 +141,11 @@ namespace FileUploaderSample
             if (isBusy)
                 return;
             isBusy = true;
-            CrossFileUploader.Current.UploadFileAsync("<URL HERE>", new FilePathItem("<FILE NAME HERE>",filePath), new Dictionary<string, string>()
-                {
-                   {"<HEADER KEY HERE>" , "<HEADER VALUE HERE>"}
-                }
+            CrossFileUploader.Current.UploadFileAsync("<URL HERE>", new FilePathItem("<FIELD NAME HERE>",filePath), new Dictionary<string, string>()
+            {
+               /*<HEADERS HERE>*/
+            }
             );
-
-           
         }
 
     }
