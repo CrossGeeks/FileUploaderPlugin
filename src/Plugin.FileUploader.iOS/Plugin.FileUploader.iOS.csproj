@@ -39,6 +39,7 @@
       <Link>CrossFileUploader.cs</Link>
     </Compile>
     <Compile Include="FileUploadManager.cs" />
+    <Compile Include="NativeTools.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

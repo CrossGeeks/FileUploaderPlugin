@@ -1,5 +1,6 @@
 using CoreFoundation;
 using Foundation;
+using MobileCoreServices;
 using Plugin.FileUploader.Abstractions;
 using System;
 using System.Collections.Generic;
@@ -87,7 +88,7 @@ namespace Plugin.FileUploader
 
                 sb.AppendFormat("--{0}\r\n", partBoundary);
                 sb.AppendFormat("Content-Disposition: form-data; name=\"{0}\"; filename=\"{1}\"\r\n", fieldName, fileName);
-                sb.Append("Content-Type: */*\r\n\r\n");
+                sb.Append($"Content-Type: {GetMimeType(fileName)}\r\n\r\n");
 
                 // Delete any previous body data file
                 if (File.Exists(filePath))
@@ -361,6 +362,36 @@ namespace Plugin.FileUploader
 
 			return path;
 		}
+
+        public string GetMimeType(string fileName)
+        {
+            try
+            {
+                var extensionWithDot = Path.GetExtension(fileName);
+                if (!string.IsNullOrWhiteSpace(extensionWithDot))
+                {
+                    var extension = extensionWithDot.Substring(1);
+                    if (!string.IsNullOrWhiteSpace(extension))
+                    {
+                        var extensionClassRef = new NSString(UTType.TagClassFilenameExtension);
+                        var mimeTypeClassRef = new NSString(UTType.TagClassMIMEType);
+
+                        var uti = NativeTools.UTTypeCreatePreferredIdentifierForTag(extensionClassRef.Handle, new NSString(extension).Handle, IntPtr.Zero);
+                        var mimeType = NativeTools.UTTypeCopyPreferredTagWithClass(uti, mimeTypeClassRef.Handle);
+                        using (var mimeTypeCString = new CoreFoundation.CFString(mimeType))
+                        {
+                            return mimeTypeCString;
+                        }
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+
+            }
+
+            return "*/*";
+        }
     }
 
 }

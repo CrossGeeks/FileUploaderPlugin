@@ -4,6 +4,7 @@ using OkHttp;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Android.Webkit;
 
 namespace Plugin.FileUploader
 {
@@ -22,7 +23,7 @@ namespace Plugin.FileUploader
                 {
                     var requestBodyBuilder = PrepareRequest(parameters);
 
-                    RequestBody fileBody = RequestBody.Create(MediaType.Parse("*/*"), fileItem.Bytes);
+                    RequestBody fileBody = RequestBody.Create(MediaType.Parse(GetMimeType(fileItem.Name)), fileItem.Bytes);
                     requestBodyBuilder.AddFormDataPart(fileItem.FieldName, fileItem.Name, fileBody);
                     return MakeRequest(url, fileItem.Name, requestBodyBuilder, headers);
                 }
@@ -51,7 +52,24 @@ namespace Plugin.FileUploader
 
             });
         }
+        string GetMimeType(string url)
+        {
+            string type = "*/*";
+            try
+            {
+                string extension = MimeTypeMap.GetFileExtensionFromUrl(url);
+                if (extension != null)
+                {
+                    type = MimeTypeMap.Singleton.GetMimeTypeFromExtension(extension);
+                }
+            }
+            catch(Exception ex)
+            {
 
+            }
+           
+            return type;
+        }
         public async Task<FileUploadResponse> UploadFileAsync(string url, FilePathItem fileItem, IDictionary<string, string> headers = null, IDictionary<string, string> parameters = null)
         {
             return await Task.Run(() =>
@@ -63,7 +81,7 @@ namespace Plugin.FileUploader
                     Java.IO.File f = new Java.IO.File(fileItem.Path);
                     string fileAbsolutePath = f.AbsolutePath;
 
-                    RequestBody file_body = RequestBody.Create(MediaType.Parse("*/*"), f);
+                    RequestBody file_body = RequestBody.Create(MediaType.Parse(GetMimeType(fileItem.Path)), f);
                     var fileName = fileAbsolutePath.Substring(fileAbsolutePath.LastIndexOf("/") + 1);
                     requestBodyBuilder.AddFormDataPart(fileItem.FieldName,fileName, file_body);
 
