@@ -2,7 +2,7 @@
 <package >
   <metadata minClientVersion="2.8.1">
     <id>Plugin.FileUploader</id>
-    <version>1.0.4</version>
+    <version>1.0.5</version>
     <title>FileUploader Plugin for Xamarin</title>
     <authors>Rendy Del Rosario</authors>
     <owners>crossgeeks,rdelrosario</owners>
@@ -12,7 +12,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Upload files using multipart request across Xamarin.iOS and Xamarin.Android</description>
     <summary>Upload files using multipart request across Xamarin.iOS and Xamarin.Android</summary>
-    <releaseNotes>Support for uploading files on Android and iOS</releaseNotes>
+    <releaseNotes>Fix: Set correct mime type if file extension available</releaseNotes>
     <copyright>Copyright 2017</copyright>
     <tags>iOS,Android,files,upload,multipart</tags>
     <dependencies>
