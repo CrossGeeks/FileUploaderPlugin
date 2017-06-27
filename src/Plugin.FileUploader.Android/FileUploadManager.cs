@@ -24,25 +24,25 @@ namespace Plugin.FileUploader
 
                     RequestBody fileBody = RequestBody.Create(MediaType.Parse("*/*"), fileItem.Bytes);
                     requestBodyBuilder.AddFormDataPart(fileItem.FieldName, fileItem.Name, fileBody);
-                    return MakeRequest(url, requestBodyBuilder, headers);
+                    return MakeRequest(url, fileItem.Name, requestBodyBuilder, headers);
                 }
                 catch (Java.Net.UnknownHostException ex)
                 {
-                    var fileUploadResponse = new FileUploadResponse("Host not reachable", -1);
+                    var fileUploadResponse = new FileUploadResponse("Host not reachable", -1, fileItem.Name);
                     FileUploadError(this, fileUploadResponse);
                     System.Diagnostics.Debug.WriteLine(ex.ToString());
                     return fileUploadResponse;
                 }
                 catch (Java.IO.IOException ex)
                 {
-                    var fileUploadResponse = new FileUploadResponse(ex.ToString(), -1);
+                    var fileUploadResponse = new FileUploadResponse(ex.ToString(), -1,fileItem.Name);
                     FileUploadError(this, fileUploadResponse);
                     System.Diagnostics.Debug.WriteLine(ex.ToString());
                     return fileUploadResponse;
                 }
                 catch (Exception ex)
                 {
-                    var fileUploadResponse = new FileUploadResponse(ex.ToString(), -1);
+                    var fileUploadResponse = new FileUploadResponse(ex.ToString(), -1, fileItem.Name);
                     FileUploadError(this, fileUploadResponse);
                     System.Diagnostics.Debug.WriteLine(ex.ToString());
                     return fileUploadResponse;
@@ -67,25 +67,25 @@ namespace Plugin.FileUploader
                     var fileName = fileAbsolutePath.Substring(fileAbsolutePath.LastIndexOf("/") + 1);
                     requestBodyBuilder.AddFormDataPart(fileItem.FieldName,fileName, file_body);
 
-                    return MakeRequest(url,requestBodyBuilder,headers);
+                    return MakeRequest(url,fileItem.Path,requestBodyBuilder,headers);
                 }
                 catch (Java.Net.UnknownHostException ex)
                 {
-                    var fileUploadResponse = new FileUploadResponse("Host not reachable", -1);
+                    var fileUploadResponse = new FileUploadResponse("Host not reachable", -1,fileItem.Path);
                     FileUploadError(this, fileUploadResponse);
                     System.Diagnostics.Debug.WriteLine(ex.ToString());
                     return fileUploadResponse;
                 }
                 catch (Java.IO.IOException ex)
                 {
-                    var fileUploadResponse = new FileUploadResponse(ex.ToString(), -1);
+                    var fileUploadResponse = new FileUploadResponse(ex.ToString(), -1, fileItem.Path);
                     FileUploadError(this, fileUploadResponse);
                     System.Diagnostics.Debug.WriteLine(ex.ToString());
                     return fileUploadResponse;
                 }
                 catch (Exception ex)
                 {
-                    var fileUploadResponse = new FileUploadResponse(ex.ToString(), -1);
+                    var fileUploadResponse = new FileUploadResponse(ex.ToString(), -1, fileItem.Path);
                     FileUploadError(this, fileUploadResponse);
                     System.Diagnostics.Debug.WriteLine(ex.ToString());
                     return fileUploadResponse;
@@ -111,7 +111,7 @@ namespace Plugin.FileUploader
             }
             return requestBodyBuilder;
         }
-        FileUploadResponse MakeRequest(string url,  MultipartBuilder requestBodyBuilder, IDictionary<string, string> headers = null)
+        FileUploadResponse MakeRequest(string url,string tag,  MultipartBuilder requestBodyBuilder, IDictionary<string, string> headers = null)
         {
             RequestBody requestBody = requestBodyBuilder.Build();
 
@@ -140,7 +140,7 @@ namespace Plugin.FileUploader
             Response response = client.NewCall(request).Execute();
             var responseString = response.Body().String();
             var code = response.Code();
-            var fileUploadResponse = new FileUploadResponse(responseString, code);
+            var fileUploadResponse = new FileUploadResponse(responseString, code, tag);
             if (response.IsSuccessful)
             {
 

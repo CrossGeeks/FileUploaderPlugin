@@ -1,6 +1,5 @@
 using CoreFoundation;
 using Foundation;
-using Newtonsoft.Json;
 using Plugin.FileUploader.Abstractions;
 using System;
 using System.Collections.Generic;
@@ -20,6 +19,7 @@ namespace Plugin.FileUploader
         public const string SessionId = "fileuploader";
         public const string UploadFileSuffix = "-multi-part";
         static readonly Encoding encoding = Encoding.UTF8;
+        string tag = "";
         public static Action UrlSessionCompletion { get; set; }
         TaskCompletionSource<FileUploadResponse> uploadCompletionSource;
         NSMutableData _data = new NSMutableData();
@@ -29,7 +29,7 @@ namespace Plugin.FileUploader
         string multiPartPath = string.Empty;
         public async Task<FileUploadResponse> UploadFileAsync(string url, FilePathItem fileItem, IDictionary<string, string> headers = null, IDictionary<string, string> parameters = null)
         {
-            
+            tag = fileItem.Path;
             string path = fileItem.Path;
             var tmpPath = path;
             var fileName = tmpPath.Substring(tmpPath.LastIndexOf("/") + 1);
@@ -51,6 +51,7 @@ namespace Plugin.FileUploader
 
         public async Task<FileUploadResponse> UploadFileAsync(string url, FileBytesItem fileItem, IDictionary<string, string> headers = null, IDictionary<string, string> parameters = null)
         {
+            tag = fileItem.Name;
             string tmpPath = GetOutputPath("tmp","tmp", fileItem.Name);
 
             multiPartPath = $"{tmpPath}{DateTime.Now.ToString("yyyMMdd_HHmmss")}{UploadFileSuffix}";
@@ -225,20 +226,20 @@ namespace Plugin.FileUploader
 
             if (error == null && !responseError)
             {
-                var fileUploadResponse = new FileUploadResponse(message, (int)response?.StatusCode);
+                var fileUploadResponse = new FileUploadResponse(message, (int)response?.StatusCode,tag);
                 uploadCompletionSource.SetResult(fileUploadResponse);
                 FileUploadCompleted(this, fileUploadResponse);
 
             }
             else if (responseError)
             {
-                var fileUploadResponse = new FileUploadResponse(message, (int)response?.StatusCode);
+                var fileUploadResponse = new FileUploadResponse(message, (int)response?.StatusCode,tag);
                 uploadCompletionSource.SetResult(fileUploadResponse);
                 FileUploadError(this, fileUploadResponse);
             }
             else
             {
-                var fileUploadResponse = new FileUploadResponse(error.Description, (int)response?.StatusCode);
+                var fileUploadResponse = new FileUploadResponse(error.Description, (int)response?.StatusCode,tag);
                 uploadCompletionSource.SetResult(fileUploadResponse);
                 FileUploadError(this, fileUploadResponse);
             }

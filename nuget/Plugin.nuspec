@@ -2,7 +2,7 @@
 <package >
   <metadata minClientVersion="2.8.1">
     <id>Plugin.FileUploader</id>
-    <version>1.0.3</version>
+    <version>1.0.4</version>
     <title>FileUploader Plugin for Xamarin</title>
     <authors>Rendy Del Rosario</authors>
     <owners>crossgeeks,rdelrosario</owners>
