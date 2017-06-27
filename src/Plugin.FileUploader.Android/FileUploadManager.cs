@@ -60,7 +60,7 @@ namespace Plugin.FileUploader
                 string extension = MimeTypeMap.GetFileExtensionFromUrl(url);
                 if (extension != null)
                 {
-                    type = MimeTypeMap.Singleton.GetMimeTypeFromExtension(extension);
+                    type = MimeTypeMap.Singleton.GetMimeTypeFromExtension(extension.ToLower());
                 }
             }
             catch(Exception ex)
