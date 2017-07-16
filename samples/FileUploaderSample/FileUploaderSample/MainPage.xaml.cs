@@ -14,6 +14,7 @@ namespace FileUploaderSample
 {
     public partial class MainPage : ContentPage
     {
+        Queue<string> paths = new Queue<string>();
         string filePath = string.Empty;
         bool isBusy = false;
         public MainPage()
@@ -39,7 +40,7 @@ namespace FileUploaderSample
                 if (file == null)
                   return;
                   filePath = file.Path;
-
+                  paths.Enqueue(filePath);
                 image.Source = ImageSource.FromStream(() =>
                 {
                   var stream = file.GetStream();
@@ -66,6 +67,8 @@ namespace FileUploaderSample
                   return;
 
                   filePath = file.Path;
+                  paths.Enqueue(filePath);
+
                 image.Source = ImageSource.FromStream(() =>
                 {
                   var stream = file.GetStream();
@@ -91,7 +94,8 @@ namespace FileUploaderSample
                 if (file == null)
                   return;
                   filePath = file.Path;
-                await  DisplayAlert("Video Recorded", "Location: " + file.Path, "OK");
+                  paths.Enqueue(filePath);
+                  await  DisplayAlert("Video Recorded", "Location: " + file.Path, "OK");
 
                 file.Dispose();
               };
@@ -108,6 +112,7 @@ namespace FileUploaderSample
                 if (file == null)
                   return;
                   filePath = file.Path;
+                  paths.Enqueue(filePath);
                   await DisplayAlert("Video Selected", "Location: " + file.Path, "OK");
                 file.Dispose();
               };
@@ -141,11 +146,21 @@ namespace FileUploaderSample
             if (isBusy)
                 return;
             isBusy = true;
+
             CrossFileUploader.Current.UploadFileAsync("<URL HERE>", new FilePathItem("<FIELD NAME HERE>",filePath), new Dictionary<string, string>()
             {
                /*<HEADERS HERE>*/
+            });
+
+            //Uploading multiple images at once
+
+            /*List<FilePathItem> pathItems = new List<FilePathItem>();
+            while (paths.Count > 0)
+            {
+                pathItems.Add(new FilePathItem("image",paths.Dequeue()));
             }
-            );
+
+            CrossFileUploader.Current.UploadFileAsync("<URL HERE>", pathItems.ToArray(), DateTime.Now.ToString("yyyMMdd_HHmmss"));*/
         }
 
     }

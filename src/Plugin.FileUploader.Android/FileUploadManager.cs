@@ -17,33 +17,55 @@ namespace Plugin.FileUploader
         public event EventHandler<FileUploadResponse> FileUploadError = delegate { };
         public async Task<FileUploadResponse> UploadFileAsync(string url, FileBytesItem fileItem, IDictionary<string, string> headers = null, IDictionary<string, string> parameters = null)
         {
+           return await UploadFileAsync(url, new FileBytesItem[] { fileItem }, fileItem.Name, headers, parameters);
+        }
+        public async Task<FileUploadResponse> UploadFileAsync(string url, FileBytesItem[] fileItems,string tag, IDictionary<string, string> headers = null, IDictionary<string, string> parameters = null)
+        {
+            if (fileItems == null || fileItems.Length == 0)
+            {
+                var fileUploadResponse = new FileUploadResponse("There are no items to upload", -1, tag);
+                FileUploadError(this, fileUploadResponse);
+                return fileUploadResponse;
+            }
+                
             return await Task.Run(() =>
             {
                 try
                 {
                     var requestBodyBuilder = PrepareRequest(parameters);
 
-                    RequestBody fileBody = RequestBody.Create(MediaType.Parse(GetMimeType(fileItem.Name)), fileItem.Bytes);
-                    requestBodyBuilder.AddFormDataPart(fileItem.FieldName, fileItem.Name, fileBody);
-                    return MakeRequest(url, fileItem.Name, requestBodyBuilder, headers);
+                    foreach(var fileItem in fileItems)
+                    {
+                        var mediaType = MediaType.Parse(GetMimeType(fileItem.Name));
+
+                        if (mediaType == null)
+                            mediaType = MediaType.Parse("*/*");
+
+
+                        RequestBody fileBody = RequestBody.Create(mediaType, fileItem.Bytes);
+                        requestBodyBuilder.AddFormDataPart(fileItem.FieldName, fileItem.Name, fileBody);
+                    }
+                   
+                    return MakeRequest(url, tag, requestBodyBuilder, headers);
+
                 }
                 catch (Java.Net.UnknownHostException ex)
                 {
-                    var fileUploadResponse = new FileUploadResponse("Host not reachable", -1, fileItem.Name);
+                    var fileUploadResponse = new FileUploadResponse("Host not reachable", -1, tag);
                     FileUploadError(this, fileUploadResponse);
                     System.Diagnostics.Debug.WriteLine(ex.ToString());
                     return fileUploadResponse;
                 }
                 catch (Java.IO.IOException ex)
                 {
-                    var fileUploadResponse = new FileUploadResponse(ex.ToString(), -1,fileItem.Name);
+                    var fileUploadResponse = new FileUploadResponse(ex.ToString(), -1,tag);
                     FileUploadError(this, fileUploadResponse);
                     System.Diagnostics.Debug.WriteLine(ex.ToString());
                     return fileUploadResponse;
                 }
                 catch (Exception ex)
                 {
-                    var fileUploadResponse = new FileUploadResponse(ex.ToString(), -1, fileItem.Name);
+                    var fileUploadResponse = new FileUploadResponse(ex.ToString(), -1, tag);
                     FileUploadError(this, fileUploadResponse);
                     System.Diagnostics.Debug.WriteLine(ex.ToString());
                     return fileUploadResponse;
@@ -58,52 +80,68 @@ namespace Plugin.FileUploader
             try
             {
                 string extension = MimeTypeMap.GetFileExtensionFromUrl(url);
-                if (extension != null)
+                if (!string.IsNullOrEmpty(extension))
                 {
                     type = MimeTypeMap.Singleton.GetMimeTypeFromExtension(extension.ToLower());
                 }
             }
             catch(Exception ex)
             {
-
+                System.Diagnostics.Debug.WriteLine(ex.ToString());
             }
            
             return type;
         }
+
         public async Task<FileUploadResponse> UploadFileAsync(string url, FilePathItem fileItem, IDictionary<string, string> headers = null, IDictionary<string, string> parameters = null)
         {
+            return await UploadFileAsync(url, new FilePathItem[] { fileItem }, fileItem.Path, headers, parameters);
+        }
+        public async Task<FileUploadResponse> UploadFileAsync(string url, FilePathItem[] fileItems,string tag, IDictionary<string, string> headers = null, IDictionary<string, string> parameters = null)
+        {
+            if (fileItems == null || fileItems.Length == 0)
+            {
+                var fileUploadResponse = new FileUploadResponse("There are no items to upload", -1, tag);
+                FileUploadError(this, fileUploadResponse);
+                return fileUploadResponse;
+            }
+
             return await Task.Run(() =>
             {
                 try
                 {
                     
                     var requestBodyBuilder = PrepareRequest(parameters);
-                    Java.IO.File f = new Java.IO.File(fileItem.Path);
-                    string fileAbsolutePath = f.AbsolutePath;
 
-                    RequestBody file_body = RequestBody.Create(MediaType.Parse(GetMimeType(fileItem.Path)), f);
-                    var fileName = fileAbsolutePath.Substring(fileAbsolutePath.LastIndexOf("/") + 1);
-                    requestBodyBuilder.AddFormDataPart(fileItem.FieldName,fileName, file_body);
+                    foreach (var fileItem in fileItems)
+                    {
+                        Java.IO.File f = new Java.IO.File(fileItem.Path);
+                        string fileAbsolutePath = f.AbsolutePath;
 
-                    return MakeRequest(url,fileItem.Path,requestBodyBuilder,headers);
+                        RequestBody file_body = RequestBody.Create(MediaType.Parse(GetMimeType(fileItem.Path)), f);
+                        var fileName = fileAbsolutePath.Substring(fileAbsolutePath.LastIndexOf("/") + 1);
+                        requestBodyBuilder.AddFormDataPart(fileItem.FieldName, fileName, file_body);
+                    }
+
+                    return MakeRequest(url,tag,requestBodyBuilder,headers);
                 }
                 catch (Java.Net.UnknownHostException ex)
                 {
-                    var fileUploadResponse = new FileUploadResponse("Host not reachable", -1,fileItem.Path);
+                    var fileUploadResponse = new FileUploadResponse("Host not reachable", -1,tag);
                     FileUploadError(this, fileUploadResponse);
                     System.Diagnostics.Debug.WriteLine(ex.ToString());
                     return fileUploadResponse;
                 }
                 catch (Java.IO.IOException ex)
                 {
-                    var fileUploadResponse = new FileUploadResponse(ex.ToString(), -1, fileItem.Path);
+                    var fileUploadResponse = new FileUploadResponse(ex.ToString(), -1, tag);
                     FileUploadError(this, fileUploadResponse);
                     System.Diagnostics.Debug.WriteLine(ex.ToString());
                     return fileUploadResponse;
                 }
                 catch (Exception ex)
                 {
-                    var fileUploadResponse = new FileUploadResponse(ex.ToString(), -1, fileItem.Path);
+                    var fileUploadResponse = new FileUploadResponse(ex.ToString(), -1, tag);
                     FileUploadError(this, fileUploadResponse);
                     System.Diagnostics.Debug.WriteLine(ex.ToString());
                     return fileUploadResponse;

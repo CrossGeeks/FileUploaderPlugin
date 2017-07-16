@@ -27,5 +27,15 @@ namespace Plugin.FileUploader
         {
             throw new NotImplementedException();
         }
+
+        public Task<FileUploadResponse> UploadFileAsync(string url, FilePathItem[] fileItems, string tag, IDictionary<string, string> headers = null, IDictionary<string, string> parameters = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<FileUploadResponse> UploadFileAsync(string url, FileBytesItem[] fileItems, string tag, IDictionary<string, string> headers = null, IDictionary<string, string> parameters = null)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -55,10 +55,10 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Plugin.FileUploader, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\Plugin.FileUploader.1.0.4\lib\portable-net45+wp80+win8+wpa81\Plugin.FileUploader.dll</HintPath>
+      <HintPath>packages\Plugin.FileUploader.1.0.9-alpha\lib\portable-net45+wp80+win8+wpa81\Plugin.FileUploader.dll</HintPath>
     </Reference>
     <Reference Include="Plugin.FileUploader.Abstractions, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\Plugin.FileUploader.1.0.4\lib\portable-net45+wp80+win8+wpa81\Plugin.FileUploader.Abstractions.dll</HintPath>
+      <HintPath>packages\Plugin.FileUploader.1.0.9-alpha\lib\portable-net45+wp80+win8+wpa81\Plugin.FileUploader.Abstractions.dll</HintPath>
     </Reference>
     <Reference Include="Plugin.Media, Version=2.6.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\..\packages\Xam.Plugin.Media.2.6.2\lib\portable-net45+wp80+win8+wpa81\Plugin.Media.dll</HintPath>

@@ -96,7 +96,16 @@ Uploading from a file bytes
   );
 
 ```
+Uploading multiple files at once
+```csharp
 
+ CrossFileUploader.Current.UploadFileAsync("<URL HERE>", new FilePathItem[]{
+    new FilePathItem("file",path1),
+	new FilePathItem("file",path2),
+	new FilePathItem("file",path3)
+ },"Upload Tag 1");
+
+ ```
 #### Events in FileUploader
 When any file upload completed/failed you can register for an event to fire:
 ```csharp

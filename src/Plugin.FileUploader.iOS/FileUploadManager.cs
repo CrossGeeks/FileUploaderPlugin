@@ -30,22 +30,61 @@ namespace Plugin.FileUploader
         string multiPartPath = string.Empty;
         public async Task<FileUploadResponse> UploadFileAsync(string url, FilePathItem fileItem, IDictionary<string, string> headers = null, IDictionary<string, string> parameters = null)
         {
-            tag = fileItem.Path;
-            string path = fileItem.Path;
-            var tmpPath = path;
-            var fileName = tmpPath.Substring(tmpPath.LastIndexOf("/") + 1);
-            if (path.StartsWith("/var/"))
+            return await UploadFileAsync(url, new FilePathItem[] { fileItem },fileItem.Path, headers, parameters);
+        }
+        public async Task<FileUploadResponse> UploadFileAsync(string url, FilePathItem[] fileItems,string tag, IDictionary<string, string> headers = null, IDictionary<string, string> parameters = null)
+        {
+            if (fileItems == null || fileItems.Length == 0)
             {
-				var data = NSData.FromUrl(new NSUrl($"file://{path}"));
-                tmpPath = SaveToDisk(data, "tmp", fileName);
+                var fileUploadResponse = new FileUploadResponse("There are no items to upload", -1, tag);
+                FileUploadError(this, fileUploadResponse);
+                return fileUploadResponse;
             }
 
-            multiPartPath = $"{tmpPath}{DateTime.Now.ToString("yyyMMdd_HHmmss")}{UploadFileSuffix}";
-     
-            partBoundary = "---------------------------" + DateTime.Now.Ticks.ToString("x");
+            bool error = false;
+            string errorMessage = string.Empty;
 
+            var uploadItems = new List<UploadFileItemInfo>();
+            foreach(var fileItem in fileItems)
+            {
+                bool temporal = false;
+                string path = fileItem.Path;
+                var tmpPath = path;
+                var fileName = tmpPath.Substring(tmpPath.LastIndexOf("/") + 1);
+                if (path.StartsWith("/var/"))
+                {
+                    var data = NSData.FromUrl(new NSUrl($"file://{path}"));
+                    tmpPath = SaveToDisk(data, "tmp", fileName);
+                    temporal = true;
+                }
 
-            await SaveToFileSystemAsync(tmpPath, fileItem.FieldName, fileName, multiPartPath, parameters);
+               // multiPartPath = $"{tmpPath}{DateTime.Now.ToString("yyyMMdd_HHmmss")}{UploadFileSuffix}";
+
+                partBoundary = "---------------------------" + DateTime.Now.Ticks.ToString("x");
+
+                if(File.Exists(tmpPath))
+                {
+                    uploadItems.Add(new UploadFileItemInfo(tmpPath, fileItem.FieldName, fileName, temporal));
+                }
+                else
+                {
+                    error = true;
+                    errorMessage = $"File at path: {fileItem.Path} doesn't exist";
+                    break;
+                }
+
+            }
+
+            if(error)
+            {
+                var fileUploadResponse = new FileUploadResponse(errorMessage, -1, tag);
+                FileUploadError(this, fileUploadResponse);
+                return fileUploadResponse;
+            }
+
+            await SaveToFileSystemAsync(uploadItems.ToArray(), parameters);
+            //tag = fileItem.Path;
+
 
             return await MakeRequest(url, headers);
         }
@@ -53,21 +92,34 @@ namespace Plugin.FileUploader
         public async Task<FileUploadResponse> UploadFileAsync(string url, FileBytesItem fileItem, IDictionary<string, string> headers = null, IDictionary<string, string> parameters = null)
         {
             tag = fileItem.Name;
-            string tmpPath = GetOutputPath("tmp","tmp", fileItem.Name);
-
-            multiPartPath = $"{tmpPath}{DateTime.Now.ToString("yyyMMdd_HHmmss")}{UploadFileSuffix}";
 
             partBoundary = "---------------------------" + DateTime.Now.Ticks.ToString("x");
 
 
-            await SaveToFileSystemAsync(fileItem.Bytes, fileItem.FieldName, fileItem.Name, multiPartPath, parameters);
+            await SaveToFileSystemAsync(new UploadFileItemInfo[] { new UploadFileItemInfo(fileItem.Bytes, fileItem.FieldName, fileItem.Name) }, parameters);
 
             return await MakeRequest(url, headers);
         }
-
-        async Task SaveToFileSystemAsync(byte[] fileBytes, string fieldName, string fileName, string filePath, IDictionary<string, string> parameters = null)
+        public async Task<FileUploadResponse> UploadFileAsync(string url, FileBytesItem[] fileItems, string tag, IDictionary<string, string> headers = null, IDictionary<string, string> parameters = null)
         {
 
+            partBoundary = "---------------------------" + DateTime.Now.Ticks.ToString("x");
+
+            var uploadItems = new List<UploadFileItemInfo>();
+            foreach (var fileItem in fileItems)
+            {
+
+                uploadItems.Add(new UploadFileItemInfo(fileItem.Bytes, fileItem.FieldName, fileItem.Name));
+
+            }
+
+            await SaveToFileSystemAsync(uploadItems.ToArray(), parameters);
+
+            return await MakeRequest(url, headers);
+        }
+        //byte[] fileBytes, string fieldName, string fileName, string filePath = null
+        async Task SaveToFileSystemAsync(UploadFileItemInfo[] itemsToUpload, IDictionary<string, string> parameters = null)
+        {
             await Task.Run(() =>
             {
                 // Construct the body
@@ -86,30 +138,63 @@ namespace Plugin.FileUploader
                 }
 
 
-                sb.AppendFormat("--{0}\r\n", partBoundary);
-                sb.AppendFormat("Content-Disposition: form-data; name=\"{0}\"; filename=\"{1}\"\r\n", fieldName, fileName);
-                sb.Append($"Content-Type: {GetMimeType(fileName)}\r\n\r\n");
+         
+
+
+                string tmpPath = GetOutputPath("tmp", "tmp", null);
+                multiPartPath = $"{tmpPath}{DateTime.Now.ToString("yyyMMdd_HHmmss")}{UploadFileSuffix}";
+
 
                 // Delete any previous body data file
-                if (File.Exists(filePath))
-                    File.Delete(filePath);
+                if (File.Exists(multiPartPath))
+                        File.Delete(multiPartPath);
 
 
-                using (var writeStream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.Read))
-                {
-                    writeStream.Write(encoding.GetBytes(sb.ToString()), 0, encoding.GetByteCount(sb.ToString()));
-                    writeStream.Write(fileBytes, 0, fileBytes.Length);
+                    using (var writeStream = new FileStream(multiPartPath, FileMode.Create, FileAccess.Write, FileShare.Read))
+                    {
+                        writeStream.Write(encoding.GetBytes(sb.ToString()), 0, encoding.GetByteCount(sb.ToString()));
 
-                    sb.Clear();
-                    sb.AppendFormat("\r\n--{0}--\r\n", partBoundary);
-                    writeStream.Write(encoding.GetBytes(sb.ToString()), 0, encoding.GetByteCount(sb.ToString()));
+                        foreach (var fileInfo in itemsToUpload)
+                        {
+                            sb.Clear();
+                            sb.AppendFormat("--{0}\r\n", partBoundary);
+                            sb.Append($"Content-Disposition: form-data; name=\"{fileInfo.FieldName}\"; filename=\"{fileInfo.FileName}\"\r\n");
+                            sb.Append($"Content-Type: {GetMimeType(fileInfo.FileName)}\r\n\r\n");
+
+                            writeStream.Write(encoding.GetBytes(sb.ToString()), 0, encoding.GetByteCount(sb.ToString()));
+                            if (fileInfo.Data != null)
+                            {
+                                writeStream.Write(fileInfo.Data, 0, fileInfo.Data.Length);
+
+                            } else if (!string.IsNullOrEmpty(fileInfo.OriginalPath) && File.Exists(fileInfo.OriginalPath))
+                            {
+                                var data = File.ReadAllBytes(fileInfo.OriginalPath);
+                                writeStream.Write(data, 0, data.Length);
+                            }
+                            
+                        writeStream.Write(encoding.GetBytes("\r\n"), 0, encoding.GetByteCount("\r\n"));
+
+                            //delete temporal files created
+                            if (fileInfo.IsTemporal && File.Exists(fileInfo.OriginalPath))
+                            {
+                                File.Delete(fileInfo.OriginalPath);
+                            }
+                        
+                           
+                            fileInfo.Data = null;
+                        }
+
+                    var boundary = $"\r\n--{partBoundary}--\r\n";
+                    writeStream.Write(encoding.GetBytes(boundary), 0, encoding.GetByteCount(boundary));
                 }
+   
+
                 sb = null;
-                fileBytes = null;
+                
             });
         }
-
-        async Task SaveToFileSystemAsync(string fileToUpload, string fieldName, string fileName, string filePath, IDictionary<string, string> parameters = null)
+        //string fileToUpload, string fieldName, string fileName, string filePath,
+        /*async Task SaveToFileSystemAsync(UploadFileItemInfo[] filesToUpload, IDictionary<string, string> parameters = null)
         {
 
             if (File.Exists(fileToUpload))
@@ -120,7 +205,7 @@ namespace Plugin.FileUploader
                     var fileBytes = File.ReadAllBytes(fileToUpload);
 
 
-                    await SaveToFileSystemAsync(fileBytes, fieldName, fileName, filePath, parameters);
+                    await SaveToFileSystemAsync(filesToUpload, parameters);
 
 					// Delete temporal file
 					if (File.Exists(fileToUpload))
@@ -134,7 +219,7 @@ namespace Plugin.FileUploader
             {
                 Console.WriteLine("Upload file doesn't exist. File: {0}", filePath);
             }
-        }
+        }*/
 
         NSUrlSessionConfiguration CreateSessionConfiguration(IDictionary<string, string> headers, string identifier)
         {
@@ -392,6 +477,31 @@ namespace Plugin.FileUploader
 
             return "*/*";
         }
+        class UploadFileItemInfo
+        {
+            public byte[] Data { get; set; }
+            public string FieldName { get;  }
+            public string FileName { get; }
+            public string OriginalPath { get;}
+
+            public bool IsTemporal { get; }
+
+            public UploadFileItemInfo(byte[] data,string fieldName,string fileName)
+            {
+                Data = data;
+                FieldName = fieldName;
+                FileName = fileName;
+            }
+
+            public UploadFileItemInfo(string originalPath, string fieldName, string fileName,bool isTemporal)
+            {
+                OriginalPath = originalPath;
+                FieldName = fieldName;
+                FileName = fileName;
+                IsTemporal = isTemporal;
+            }
+        }
+
     }
 
 }

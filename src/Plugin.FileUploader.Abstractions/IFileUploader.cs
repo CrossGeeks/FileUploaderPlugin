@@ -17,6 +17,7 @@ namespace Plugin.FileUploader.Abstractions
         /// Event handler when file is upload fails
         /// </summary>
         event EventHandler<FileUploadResponse> FileUploadError;
+        
         /// <summary>
         /// Upload file using file path
         /// </summary>
@@ -26,6 +27,17 @@ namespace Plugin.FileUploader.Abstractions
         /// <param name="parameters">Additional parameters for upload request</param>
         /// <returns>FileUploadResponse</returns>
         Task<FileUploadResponse> UploadFileAsync(string url, FilePathItem fileItem, IDictionary<string,string> headers =null,IDictionary < string, string> parameters = null);
+        
+        /// <summary>
+        /// Upload file using file path
+        /// </summary>
+        /// <param name="url">Url for file uploading</param>
+        /// <param name="fileItems">File path items to be uploaded</param>
+        /// <param name="tag">Tag reference of the upload request</param>
+        /// <param name="headers">Request headers</param>
+        /// <param name="parameters">Additional parameters for upload request</param>
+        /// <returns>FileUploadResponse</returns>
+        Task<FileUploadResponse> UploadFileAsync(string url, FilePathItem[] fileItems,string tag, IDictionary<string, string> headers = null, IDictionary<string, string> parameters = null);
 
         /// <summary>
         /// Upload file using file bytes
@@ -36,5 +48,17 @@ namespace Plugin.FileUploader.Abstractions
         /// <param name="parameters">Additional parameters for upload request</param>
         /// <returns>FileUploadResponse</returns>
         Task<FileUploadResponse> UploadFileAsync(string url, FileBytesItem fileItem, IDictionary<string, string> headers = null, IDictionary<string, string> parameters = null);
+
+
+        /// <summary>
+        /// Upload file using file bytes
+        /// </summary>
+        /// <param name="url">Url for file uploading</param>
+        /// <param name="fileItems">File bytes of items to be uploaded</param>
+        /// <param name="tag">Tag reference of upload request</param>
+        /// <param name="headers">Request headers</param>
+        /// <param name="parameters">Additional parameters for upload request</param>
+        /// <returns>FileUploadResponse</returns>
+        Task<FileUploadResponse> UploadFileAsync(string url, FileBytesItem[] fileItems,string tag, IDictionary<string, string> headers = null, IDictionary<string, string> parameters = null);
     }
 }
