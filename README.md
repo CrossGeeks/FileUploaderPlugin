@@ -129,7 +129,8 @@ event EventHandler<FileUploadResponse> FileUploadError;
  event EventHandler<FileUploadProgress> FileUploadProgress;
  ```
 
-You will get a FileUploadResponse with the status and response message:
+For events **FileUploadCompleted** and **FileUploadError** you will get a FileUploadResponse with the status and response message:
+
 ```csharp
 public class FileUploadResponse
 {
@@ -150,7 +151,7 @@ Usage sample:
 
 ```
 
-While upload is in progress you can get feedback on event FileUploadProgress
+While upload is in progress you can get feedback on event **FileUploadProgress**
 
 You will get a FileUploadProgress with the total bytes sent, total request byte length and progress percentage
 
