@@ -119,6 +119,15 @@ namespace FileUploaderSample
 
             CrossFileUploader.Current.FileUploadCompleted += Current_FileUploadCompleted;
             CrossFileUploader.Current.FileUploadError += Current_FileUploadError;
+            CrossFileUploader.Current.FileUploadProgress += Current_FileUploadProgress;
+        }
+
+        private void Current_FileUploadProgress(object sender, FileUploadProgress e)
+        {
+            Device.BeginInvokeOnMainThread(() =>
+            {
+                progress.Progress = e.Percentage / 100.0f;
+            });
         }
 
         private void Current_FileUploadError(object sender, FileUploadResponse e)
@@ -128,6 +137,8 @@ namespace FileUploaderSample
             Device.BeginInvokeOnMainThread(async() =>
             {
                await DisplayAlert("File Upload", "Upload Failed", "Ok");
+                progress.IsVisible = false;
+                progress.Progress = 0.0f;
             });
         }
 
@@ -138,6 +149,8 @@ namespace FileUploaderSample
             Device.BeginInvokeOnMainThread(async() =>
             {
                 await DisplayAlert("File Upload", "Upload Completed", "Ok");
+                progress.IsVisible = false;
+                progress.Progress = 0.0f;
             });
         }
 
@@ -146,11 +159,8 @@ namespace FileUploaderSample
             if (isBusy)
                 return;
             isBusy = true;
+            progress.IsVisible = true;
 
-            CrossFileUploader.Current.UploadFileAsync("<URL HERE>", new FilePathItem("<FIELD NAME HERE>",filePath), new Dictionary<string, string>()
-            {
-               /*<HEADERS HERE>*/
-            });
 
             //Uploading multiple images at once
 
@@ -158,9 +168,16 @@ namespace FileUploaderSample
             while (paths.Count > 0)
             {
                 pathItems.Add(new FilePathItem("image",paths.Dequeue()));
-            }
+            }*/
 
-            CrossFileUploader.Current.UploadFileAsync("<URL HERE>", pathItems.ToArray(), DateTime.Now.ToString("yyyMMdd_HHmmss"));*/
+            CrossFileUploader.Current.UploadFileAsync("<URL HERE>", new FilePathItem("<FIELD NAME HERE>",filePath), new Dictionary<string, string>()
+            {
+               /*<HEADERS HERE>*/
+            });
+
+          
+
+           
         }
 
     }

@@ -12,8 +12,9 @@
             <Button x:Name="pickPhoto" Text="Pick Photo"/>
             <Button x:Name="takeVideo" Text="Take Video"/>
             <Button x:Name="pickVideo" Text="Pick Video"/>
-
+            <ProgressBar x:Name="progress" Progress="0.0" IsVisible="False" />
             <Image x:Name="image"/>
+           
         </StackLayout>
     </ScrollView>
 </ContentPage>

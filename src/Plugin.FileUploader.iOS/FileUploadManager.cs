@@ -27,6 +27,8 @@ namespace Plugin.FileUploader
 
         public event EventHandler<FileUploadResponse> FileUploadCompleted = delegate { };
         public event EventHandler<FileUploadResponse> FileUploadError = delegate { };
+        public event EventHandler<FileUploadProgress> FileUploadProgress = delegate { };
+
         string multiPartPath = string.Empty;
         public async Task<FileUploadResponse> UploadFileAsync(string url, FilePathItem fileItem, IDictionary<string, string> headers = null, IDictionary<string, string> parameters = null)
         {
@@ -379,6 +381,9 @@ namespace Plugin.FileUploader
 
         public override void DidSendBodyData(NSUrlSession session, NSUrlSessionTask task, long bytesSent, long totalBytesSent, long totalBytesExpectedToSend)
         {
+            var fileUploadProgress = new FileUploadProgress(totalBytesSent,totalBytesExpectedToSend);
+            FileUploadProgress(this, fileUploadProgress);
+
             System.Diagnostics.Debug.WriteLine(string.Format("DidSendBodyData bSent: {0}, totalBSent: {1} totalExpectedToSend: {2}", bytesSent, totalBytesSent, totalBytesExpectedToSend));
         }
 

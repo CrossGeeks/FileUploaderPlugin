@@ -57,7 +57,9 @@
     <Compile Include="..\Plugin.FileUploader\CrossFileUploader.cs">
       <Link>CrossFileUploader.cs</Link>
     </Compile>
+    <Compile Include="CountingRequestBody.cs" />
     <Compile Include="FileUploadManager.cs" />
+    <Compile Include="ICountProgressListener.cs" />
     <Compile Include="Resources\Resource.Designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

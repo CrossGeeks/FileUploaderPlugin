@@ -37,6 +37,7 @@
   <ItemGroup>
     <Compile Include="FileBytesItem.cs" />
     <Compile Include="FilePathItem.cs" />
+    <Compile Include="FileUploadProgress.cs" />
     <Compile Include="FileUploadResponse.cs" />
     <Compile Include="IFileUploader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -17,7 +17,11 @@ namespace Plugin.FileUploader.Abstractions
         /// Event handler when file is upload fails
         /// </summary>
         event EventHandler<FileUploadResponse> FileUploadError;
-        
+        /// <summary>
+        /// Event handler when file upload is in progress, indicates what's the upload progress so far
+        /// </summary>
+        event EventHandler<FileUploadProgress> FileUploadProgress;
+
         /// <summary>
         /// Upload file using file path
         /// </summary>

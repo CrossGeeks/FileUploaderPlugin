@@ -11,10 +11,12 @@ namespace Plugin.FileUploader
     /// <summary>
     /// Implementation for Feature
     /// </summary>
-    public class FileUploadManager : IFileUploader
+    public class FileUploadManager : IFileUploader, ICountProgressListener
     {
         public event EventHandler<FileUploadResponse> FileUploadCompleted = delegate { };
         public event EventHandler<FileUploadResponse> FileUploadError = delegate { };
+        public event EventHandler<FileUploadProgress> FileUploadProgress = delegate { };
+
         public async Task<FileUploadResponse> UploadFileAsync(string url, FileBytesItem fileItem, IDictionary<string, string> headers = null, IDictionary<string, string> parameters = null)
         {
            return await UploadFileAsync(url, new FileBytesItem[] { fileItem }, fileItem.Name, headers, parameters);
@@ -41,7 +43,7 @@ namespace Plugin.FileUploader
                         if (mediaType == null)
                             mediaType = MediaType.Parse("*/*");
 
-
+                        
                         RequestBody fileBody = RequestBody.Create(mediaType, fileItem.Bytes);
                         requestBodyBuilder.AddFormDataPart(fileItem.FieldName, fileItem.Name, fileBody);
                     }
@@ -169,8 +171,8 @@ namespace Plugin.FileUploader
         }
         FileUploadResponse MakeRequest(string url,string tag,  MultipartBuilder requestBodyBuilder, IDictionary<string, string> headers = null)
         {
-            RequestBody requestBody = requestBodyBuilder.Build();
-
+            //RequestBody requestBody = requestBodyBuilder.Build();
+            CountingRequestBody requestBody = new CountingRequestBody(requestBodyBuilder.Build(),this);
             var requestBuilder = new Request.Builder();
 
             if (headers != null)
@@ -210,6 +212,12 @@ namespace Plugin.FileUploader
                 FileUploadError(this, fileUploadResponse);
                 return fileUploadResponse;
             }
+        }
+
+        public void OnProgress(long bytesWritten, long contentLength)
+        {
+            var fileUploadProgress = new FileUploadProgress(bytesWritten, contentLength);
+            FileUploadProgress(this, fileUploadProgress);
         }
     }
 }
