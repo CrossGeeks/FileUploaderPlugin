@@ -168,7 +168,7 @@ Usage sample:
 ```csharp
   CrossFileUploader.Current.FileUploadProgress += (sender, uploadProgress) =>
   {
-      System.Diagnostics.Debug.WriteLine($"{response.TotalBytesSent} - {response.Percentage}");
+      System.Diagnostics.Debug.WriteLine($"{uploadProgress.TotalBytesSent} - {uploadProgress.Percentage}");
   };
 ```
 ### **IMPORTANT**
