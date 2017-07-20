@@ -122,6 +122,13 @@ event EventHandler<FileUploadResponse> FileUploadCompleted;
 event EventHandler<FileUploadResponse> FileUploadError; 
 ```
 
+```csharp
+ /// <summary>
+ /// Event handler when file upload is in progress, indicates what's the upload progress so far
+ /// </summary>
+ event EventHandler<FileUploadProgress> FileUploadProgress;
+ ```
+
 You will get a FileUploadResponse with the status and response message:
 ```csharp
 public class FileUploadResponse
@@ -141,6 +148,28 @@ Usage sample:
   
   CrossFileUploader.Current.UploadFileAsync($"<UPLOAD URL HERE>",new FileItem("<FIELD NAME HERE>","<FILE PATH HERE>"));
 
+```
+
+While upload is in progress you can get feedback on event FileUploadProgress
+
+You will get a FileUploadProgress with the total bytes sent, total request byte length and progress percentage
+
+```csharp
+public class FileUploadProgress
+{
+        public long TotalBytesSent { get; }
+        public long TotalLength { get; }
+        public double Percentage { get; }
+
+}
+```
+
+Usage sample:
+```csharp
+  CrossFileUploader.Current.FileUploadProgress += (sender, uploadProgress) =>
+  {
+      System.Diagnostics.Debug.WriteLine($"{response.TotalBytesSent} - {response.Percentage}");
+  };
 ```
 ### **IMPORTANT**
 
