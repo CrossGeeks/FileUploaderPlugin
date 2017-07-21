@@ -189,3 +189,9 @@ On AppDelegate.cs
 ```
 
 Also consider on iOS 9+, your URL must be secured or you have to add the domain to the list of exceptions. See https://github.com/codepath/ios_guides/wiki/App-Transport-Security
+
+#### Contributors
+
+* [Rendy Del Rosario](https://github.com/rdelrosario)
+* [Charlin Agramonte](https://github.com/char0394)
+* [Angel Andres Mañon](https://github.com/AngelAndresM)
