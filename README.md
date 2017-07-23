@@ -190,6 +190,10 @@ On AppDelegate.cs
 
 Also consider on iOS 9+, your URL must be secured or you have to add the domain to the list of exceptions. See https://github.com/codepath/ios_guides/wiki/App-Transport-Security
 
+![Android Upload](https://github.com/CrossGeeks/FileUploaderPlugin/blob/master/FileUploader%20Plugin%20-%20Android.gif?raw=true)
+![iOS Upload](https://github.com/CrossGeeks/FileUploaderPlugin/blob/master/FileUploader%20Plugin%20-%20iOS.gif?raw=true)
+
+
 #### Contributors
 
 * [Rendy Del Rosario](https://github.com/rdelrosario)
