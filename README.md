@@ -1,9 +1,11 @@
 ## FileUploader Plugin for Xamarin iOS and Android
 Simple cross platform plugin for file multipart uploads.
 
-![Android Upload](https://github.com/CrossGeeks/FileUploaderPlugin/blob/master/FileUploader%20Plugin%20-%20Android.gif?raw=true)
+<p align="center">
+<img src="https://github.com/CrossGeeks/FileUploaderPlugin/blob/master/FileUploader%20Plugin%20-%20Android.gif" title="Android"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<img src="https://github.com/CrossGeeks/FileUploaderPlugin/blob/master/FileUploader%20Plugin%20-%20iOS.gif" title="iOS"/>
+</p>
 
-![iOS Upload](https://github.com/CrossGeeks/FileUploaderPlugin/blob/master/FileUploader%20Plugin%20-%20iOS.gif?raw=true)
 
 
 ### Setup
