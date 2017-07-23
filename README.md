@@ -1,6 +1,11 @@
 ## FileUploader Plugin for Xamarin iOS and Android
 Simple cross platform plugin for file multipart uploads.
 
+![Android Upload](https://github.com/CrossGeeks/FileUploaderPlugin/blob/master/FileUploader%20Plugin%20-%20Android.gif?raw=true)
+
+![iOS Upload](https://github.com/CrossGeeks/FileUploaderPlugin/blob/master/FileUploader%20Plugin%20-%20iOS.gif?raw=true)
+
+
 ### Setup
 * Available on NuGet: http://www.nuget.org/packages/Plugin.FileUploader [![NuGet](https://img.shields.io/nuget/v/Plugin.FileUploader.svg?label=NuGet)](https://www.nuget.org/packages/Plugin.FileUploader/)
 * Install into your PCL project and Client projects.
@@ -189,9 +194,6 @@ On AppDelegate.cs
 ```
 
 Also consider on iOS 9+, your URL must be secured or you have to add the domain to the list of exceptions. See https://github.com/codepath/ios_guides/wiki/App-Transport-Security
-
-![Android Upload](https://github.com/CrossGeeks/FileUploaderPlugin/blob/master/FileUploader%20Plugin%20-%20Android.gif?raw=true)
-![iOS Upload](https://github.com/CrossGeeks/FileUploaderPlugin/blob/master/FileUploader%20Plugin%20-%20iOS.gif?raw=true)
 
 
 #### Contributors
