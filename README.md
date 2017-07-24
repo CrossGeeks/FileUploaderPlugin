@@ -6,7 +6,12 @@ Simple cross platform plugin for file multipart uploads.
 <img src="https://github.com/CrossGeeks/FileUploaderPlugin/blob/master/FileUploader%20Plugin%20-%20iOS.gif" title="iOS"/>
 </p>
 
+## Features
 
+- Multipart file uploading with headers and parameters
+- Upload multiple files at once
+- Upload request progress feedback
+- Upload files by using bytes or file path
 
 ### Setup
 * Available on NuGet: http://www.nuget.org/packages/Plugin.FileUploader [![NuGet](https://img.shields.io/nuget/v/Plugin.FileUploader.svg?label=NuGet)](https://www.nuget.org/packages/Plugin.FileUploader/)
