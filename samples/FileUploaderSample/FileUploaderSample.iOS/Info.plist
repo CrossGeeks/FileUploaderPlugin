@@ -53,7 +53,7 @@
 	<key>NSMicrophoneUsageDescription</key>
 	<string>This app needs microphone for video</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.crossgeeks.fileuploader</string>
+	<string>com.crossgeeks.fileuploadersample</string>
 	<key>CFBundleName</key>
 	<string>FileUploaderSample</string>
 	<key>NSAppTransportSecurity</key>

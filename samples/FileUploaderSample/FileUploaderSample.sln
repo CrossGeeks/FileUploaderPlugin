@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26430.14
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileUploaderSample", "FileUploaderSample.csproj", "{CD279910-CDBD-4D14-96EE-7F3F933DADDE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileUploaderSample", "FileUploaderSample\FileUploaderSample.csproj", "{CD279910-CDBD-4D14-96EE-7F3F933DADDE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileUploaderSample.Android", "..\FileUploaderSample.Android\FileUploaderSample.Android.csproj", "{C6F11721-D06B-4638-95ED-8A448807B765}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileUploaderSample.Android", "FileUploaderSample.Android\FileUploaderSample.Android.csproj", "{C6F11721-D06B-4638-95ED-8A448807B765}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileUploaderSample.iOS", "..\FileUploaderSample.iOS\FileUploaderSample.iOS.csproj", "{2ECCC135-62B6-4282-8DCC-48EBD154068A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileUploaderSample.iOS", "FileUploaderSample.iOS\FileUploaderSample.iOS.csproj", "{2ECCC135-62B6-4282-8DCC-48EBD154068A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
