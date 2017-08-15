@@ -28,6 +28,14 @@ EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Plugin.FileUploader.Shared", "Plugin.FileUploader.Shared\Plugin.FileUploader.Shared.shproj", "{65CF4602-6D4D-4C27-913C-8DEE9339CFCA}"
 EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		Plugin.FileUploader.Shared\Plugin.FileUploader.Shared.projitems*{22de81f9-070f-474b-8033-33c6b49659ce}*SharedItemsImports = 4
+		Plugin.FileUploader.Shared\Plugin.FileUploader.Shared.projitems*{2882aeeb-d4cd-4eb9-8a6c-6653b33681f0}*SharedItemsImports = 4
+		Plugin.FileUploader.Shared\Plugin.FileUploader.Shared.projitems*{3e78ac84-4026-4dc0-897e-952029fdaab2}*SharedItemsImports = 4
+		Plugin.FileUploader.Shared\Plugin.FileUploader.Shared.projitems*{56a56f17-7de1-4ca1-9617-bf32e971ac84}*SharedItemsImports = 4
+		Plugin.FileUploader.Shared\Plugin.FileUploader.Shared.projitems*{65cf4602-6d4d-4c27-913c-8dee9339cfca}*SharedItemsImports = 13
+		Plugin.FileUploader.Shared\Plugin.FileUploader.Shared.projitems*{b1ae7835-648e-4093-8a01-37cc930b770e}*SharedItemsImports = 4
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Ad-Hoc|Any CPU = Ad-Hoc|Any CPU
 		Ad-Hoc|ARM = Ad-Hoc|ARM

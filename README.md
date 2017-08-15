@@ -24,6 +24,9 @@ Simple cross platform plugin for file multipart uploads.
 | ------------------- | :------------------: |
 |Xamarin.iOS|iOS 7+|
 |Xamarin.Android|API 15+|
+|Xamarin.Mac|10.9+|
+|watchOS|2.0+|
+|tvOS|9.0+|
 
 ### API Usage
 

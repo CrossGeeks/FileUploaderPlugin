@@ -54,9 +54,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\Plugin.FileUploader\CrossFileUploader.cs">
-      <Link>CrossFileUploader.cs</Link>
-    </Compile>
     <Compile Include="CountingRequestBody.cs" />
     <Compile Include="FileUploadManager.cs" />
     <Compile Include="ICountProgressListener.cs" />
@@ -73,6 +70,7 @@
       <Name>Plugin.FileUploader.Abstractions</Name>
     </ProjectReference>
   </ItemGroup>
+  <Import Project="..\Plugin.FileUploader.Shared\Plugin.FileUploader.Shared.projitems" Label="Shared" />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
