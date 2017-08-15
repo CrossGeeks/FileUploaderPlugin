@@ -36,6 +36,8 @@ namespace Plugin.FileUploader
         }
         public async Task<FileUploadResponse> UploadFileAsync(string url, FilePathItem[] fileItems,string tag, IDictionary<string, string> headers = null, IDictionary<string, string> parameters = null)
         {
+            this.tag = tag;
+
             if (fileItems == null || fileItems.Length == 0)
             {
                 var fileUploadResponse = new FileUploadResponse("There are no items to upload", -1, tag);
@@ -85,7 +87,7 @@ namespace Plugin.FileUploader
             }
 
             await SaveToFileSystemAsync(uploadItems.ToArray(), parameters);
-            //tag = fileItem.Path;
+          
 
 
             return await MakeRequest(url, headers);
@@ -104,7 +106,7 @@ namespace Plugin.FileUploader
         }
         public async Task<FileUploadResponse> UploadFileAsync(string url, FileBytesItem[] fileItems, string tag, IDictionary<string, string> headers = null, IDictionary<string, string> parameters = null)
         {
-
+            this.tag = tag;
             partBoundary = "---------------------------" + DateTime.Now.Ticks.ToString("x");
 
             var uploadItems = new List<UploadFileItemInfo>();
