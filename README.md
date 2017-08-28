@@ -1,4 +1,4 @@
-## FileUploader Plugin for Xamarin iOS and Android
+## FileUploader Plugin for Xamarin iOS, Android, UWP, Mac, tvOS and watchOS
 Simple cross platform plugin for file multipart uploads.
 
 <p align="center">
@@ -24,6 +24,7 @@ Simple cross platform plugin for file multipart uploads.
 | ------------------- | :------------------: |
 |Xamarin.iOS|iOS 7+|
 |Xamarin.Android|API 15+|
+|Windows 10 UWP|10+|
 |Xamarin.Mac|10.9+|
 |watchOS|2.0+|
 |tvOS|9.0+|

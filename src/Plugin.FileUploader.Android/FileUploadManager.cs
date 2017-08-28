@@ -17,11 +17,11 @@ namespace Plugin.FileUploader
         public event EventHandler<FileUploadResponse> FileUploadError = delegate { };
         public event EventHandler<FileUploadProgress> FileUploadProgress = delegate { };
 
-        public async Task<FileUploadResponse> UploadFileAsync(string url, FileBytesItem fileItem, IDictionary<string, string> headers = null, IDictionary<string, string> parameters = null)
+        public async Task<FileUploadResponse> UploadFileAsync(string url, FileBytesItem fileItem, IDictionary<string, string> headers = null, IDictionary<string, string> parameters = null, string boundary = null)
         {
-           return await UploadFileAsync(url, new FileBytesItem[] { fileItem }, fileItem.Name, headers, parameters);
+           return await UploadFileAsync(url, new FileBytesItem[] { fileItem }, fileItem.Name, headers, parameters,boundary);
         }
-        public async Task<FileUploadResponse> UploadFileAsync(string url, FileBytesItem[] fileItems,string tag, IDictionary<string, string> headers = null, IDictionary<string, string> parameters = null)
+        public async Task<FileUploadResponse> UploadFileAsync(string url, FileBytesItem[] fileItems,string tag, IDictionary<string, string> headers = null, IDictionary<string, string> parameters = null, string boundary = null)
         {
             if (fileItems == null || fileItems.Length == 0)
             {
@@ -34,7 +34,7 @@ namespace Plugin.FileUploader
             {
                 try
                 {
-                    var requestBodyBuilder = PrepareRequest(parameters);
+                    var requestBodyBuilder = PrepareRequest(parameters,boundary);
 
                     foreach(var fileItem in fileItems)
                     {
@@ -95,11 +95,11 @@ namespace Plugin.FileUploader
             return type;
         }
 
-        public async Task<FileUploadResponse> UploadFileAsync(string url, FilePathItem fileItem, IDictionary<string, string> headers = null, IDictionary<string, string> parameters = null)
+        public async Task<FileUploadResponse> UploadFileAsync(string url, FilePathItem fileItem, IDictionary<string, string> headers = null, IDictionary<string, string> parameters = null, string boundary = null)
         {
-            return await UploadFileAsync(url, new FilePathItem[] { fileItem }, fileItem.Path, headers, parameters);
+            return await UploadFileAsync(url, new FilePathItem[] { fileItem }, fileItem.Path, headers, parameters,boundary);
         }
-        public async Task<FileUploadResponse> UploadFileAsync(string url, FilePathItem[] fileItems,string tag, IDictionary<string, string> headers = null, IDictionary<string, string> parameters = null)
+        public async Task<FileUploadResponse> UploadFileAsync(string url, FilePathItem[] fileItems,string tag, IDictionary<string, string> headers = null, IDictionary<string, string> parameters = null, string boundary = null)
         {
             if (fileItems == null || fileItems.Length == 0)
             {
@@ -113,7 +113,7 @@ namespace Plugin.FileUploader
                 try
                 {
                     
-                    var requestBodyBuilder = PrepareRequest(parameters);
+                    var requestBodyBuilder = PrepareRequest(parameters,boundary);
 
                     foreach (var fileItem in fileItems)
                     {
@@ -152,10 +152,20 @@ namespace Plugin.FileUploader
         }
 
 
-        MultipartBuilder PrepareRequest(IDictionary<string, string> parameters = null)
+        MultipartBuilder PrepareRequest(IDictionary<string, string> parameters = null,string boundary = null)
         {
-            MultipartBuilder requestBodyBuilder = new MultipartBuilder()
+            MultipartBuilder requestBodyBuilder = null;
+
+            if(string.IsNullOrEmpty(boundary))
+            {
+                requestBodyBuilder = new MultipartBuilder()
                         .Type(MultipartBuilder.Form);
+            }
+            else
+            {
+                requestBodyBuilder = new MultipartBuilder(boundary)
+                        .Type(MultipartBuilder.Form);
+            }
 
             if (parameters != null)
             {

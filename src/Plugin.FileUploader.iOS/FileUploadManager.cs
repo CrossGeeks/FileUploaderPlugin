@@ -126,28 +126,23 @@ namespace Plugin.FileUploader
               {"avi", "video/x-msvideo"}
         };
         #endif
-        string partBoundary;
         public const string SessionId = "fileuploader";
         public const string UploadFileSuffix = "-multi-part";
         static readonly Encoding encoding = Encoding.UTF8;
-        string tag = "";
         public static Action UrlSessionCompletion { get; set; }
         TaskCompletionSource<FileUploadResponse> uploadCompletionSource;
-        NSMutableData _data = new NSMutableData();
-
+       // NSMutableData _data = new NSMutableData();
+        IDictionary<nuint, NSMutableData> uploadData = new Dictionary<nuint, NSMutableData>();
         public event EventHandler<FileUploadResponse> FileUploadCompleted = delegate { };
         public event EventHandler<FileUploadResponse> FileUploadError = delegate { };
         public event EventHandler<FileUploadProgress> FileUploadProgress = delegate { };
 
-        string multiPartPath = string.Empty;
-        public async Task<FileUploadResponse> UploadFileAsync(string url, FilePathItem fileItem, IDictionary<string, string> headers = null, IDictionary<string, string> parameters = null)
+        public async Task<FileUploadResponse> UploadFileAsync(string url, FilePathItem fileItem, IDictionary<string, string> headers = null, IDictionary<string, string> parameters = null,string boundary = null)
         {
-            return await UploadFileAsync(url, new FilePathItem[] { fileItem },fileItem.Path, headers, parameters);
+            return await UploadFileAsync(url, new FilePathItem[] { fileItem },fileItem.Path, headers, parameters,boundary);
         }
-        public async Task<FileUploadResponse> UploadFileAsync(string url, FilePathItem[] fileItems,string tag, IDictionary<string, string> headers = null, IDictionary<string, string> parameters = null)
+        public async Task<FileUploadResponse> UploadFileAsync(string url, FilePathItem[] fileItems,string tag, IDictionary<string, string> headers = null, IDictionary<string, string> parameters = null, string boundary = null)
         {
-            this.tag = tag;
-
             if (fileItems == null || fileItems.Length == 0)
             {
                 var fileUploadResponse = new FileUploadResponse("There are no items to upload", -1, tag);
@@ -172,11 +167,12 @@ namespace Plugin.FileUploader
                     temporal = true;
                 }
 
-               // multiPartPath = $"{tmpPath}{DateTime.Now.ToString("yyyMMdd_HHmmss")}{UploadFileSuffix}";
+                if(string.IsNullOrEmpty(boundary))
+                {
+                    boundary = "---------------------------" + DateTime.Now.Ticks.ToString("x");
+                }
 
-                partBoundary = "---------------------------" + DateTime.Now.Ticks.ToString("x");
-
-                if(File.Exists(tmpPath))
+                if (File.Exists(tmpPath))
                 {
                     uploadItems.Add(new UploadFileItemInfo(tmpPath, fileItem.FieldName, fileName, temporal));
                 }
@@ -196,29 +192,33 @@ namespace Plugin.FileUploader
                 return fileUploadResponse;
             }
 
-            await SaveToFileSystemAsync(uploadItems.ToArray(), parameters);
+            var mPath = await SaveToFileSystemAsync(uploadItems.ToArray(), parameters,boundary);
           
 
 
-            return await MakeRequest(url, headers);
+            return await MakeRequest(mPath, tag, url, headers,boundary);
         }
 
-        public async Task<FileUploadResponse> UploadFileAsync(string url, FileBytesItem fileItem, IDictionary<string, string> headers = null, IDictionary<string, string> parameters = null)
+        public async Task<FileUploadResponse> UploadFileAsync(string url, FileBytesItem fileItem, IDictionary<string, string> headers = null, IDictionary<string, string> parameters = null,string boundary = null)
         {
-            tag = fileItem.Name;
+            if (string.IsNullOrEmpty(boundary))
+            {
+                boundary = "---------------------------" + DateTime.Now.Ticks.ToString("x");
+            }
 
-            partBoundary = "---------------------------" + DateTime.Now.Ticks.ToString("x");
 
+            var mPath = await SaveToFileSystemAsync(new UploadFileItemInfo[] { new UploadFileItemInfo(fileItem.Bytes, fileItem.FieldName, fileItem.Name) }, parameters,boundary);
 
-            await SaveToFileSystemAsync(new UploadFileItemInfo[] { new UploadFileItemInfo(fileItem.Bytes, fileItem.FieldName, fileItem.Name) }, parameters);
-
-            return await MakeRequest(url, headers);
+            return await MakeRequest(mPath, fileItem.Name, url, headers,boundary);
         }
-        public async Task<FileUploadResponse> UploadFileAsync(string url, FileBytesItem[] fileItems, string tag, IDictionary<string, string> headers = null, IDictionary<string, string> parameters = null)
+        public async Task<FileUploadResponse> UploadFileAsync(string url, FileBytesItem[] fileItems, string tag, IDictionary<string, string> headers = null, IDictionary<string, string> parameters = null,string boundary =null)
         {
-            this.tag = tag;
-            partBoundary = "---------------------------" + DateTime.Now.Ticks.ToString("x");
 
+            if (string.IsNullOrEmpty(boundary))
+            {
+                boundary = "---------------------------" + DateTime.Now.Ticks.ToString("x");
+            }
+            
             var uploadItems = new List<UploadFileItemInfo>();
             foreach (var fileItem in fileItems)
             {
@@ -227,14 +227,14 @@ namespace Plugin.FileUploader
 
             }
 
-            await SaveToFileSystemAsync(uploadItems.ToArray(), parameters);
+            var mPath = await SaveToFileSystemAsync(uploadItems.ToArray(), parameters,boundary);
 
-            return await MakeRequest(url, headers);
+            return await MakeRequest(mPath, tag, url, headers,boundary);
         }
-        //byte[] fileBytes, string fieldName, string fileName, string filePath = null
-        async Task SaveToFileSystemAsync(UploadFileItemInfo[] itemsToUpload, IDictionary<string, string> parameters = null)
+       
+        async Task<string> SaveToFileSystemAsync(UploadFileItemInfo[] itemsToUpload, IDictionary<string, string> parameters = null,string boundary = null)
         {
-            await Task.Run(() =>
+           return await Task.Run(() =>
             {
                 // Construct the body
                 System.Text.StringBuilder sb = new System.Text.StringBuilder("");
@@ -244,7 +244,7 @@ namespace Plugin.FileUploader
                     {
                         if (parameters[vkp] != null)
                         {
-                            sb.AppendFormat("--{0}\r\n", partBoundary);
+                            sb.AppendFormat("--{0}\r\n", boundary);
                             sb.AppendFormat("Content-Disposition: form-data; name=\"{0}\"\r\n\r\n", vkp);
                             sb.AppendFormat("{0}\r\n", parameters[vkp]);
                         }
@@ -256,7 +256,7 @@ namespace Plugin.FileUploader
 
 
                 string tmpPath = GetOutputPath("tmp", "tmp", null);
-                multiPartPath = $"{tmpPath}{DateTime.Now.ToString("yyyMMdd_HHmmss")}{UploadFileSuffix}";
+                var multiPartPath = $"{tmpPath}{DateTime.Now.ToString("yyyMMdd_HHmmss")}{UploadFileSuffix}";
 
 
                 // Delete any previous body data file
@@ -271,7 +271,7 @@ namespace Plugin.FileUploader
                         foreach (var fileInfo in itemsToUpload)
                         {
                             sb.Clear();
-                            sb.AppendFormat("--{0}\r\n", partBoundary);
+                            sb.AppendFormat("--{0}\r\n", boundary);
                             sb.Append($"Content-Disposition: form-data; name=\"{fileInfo.FieldName}\"; filename=\"{fileInfo.FileName}\"\r\n");
                             sb.Append($"Content-Type: {GetMimeType(fileInfo.FileName)}\r\n\r\n");
 
@@ -297,51 +297,23 @@ namespace Plugin.FileUploader
                            
                             fileInfo.Data = null;
                         }
-
-                    var boundary = $"\r\n--{partBoundary}--\r\n";
-                    writeStream.Write(encoding.GetBytes(boundary), 0, encoding.GetByteCount(boundary));
+                        
+                    writeStream.Write(encoding.GetBytes($"\r\n--{boundary}--\r\n"), 0, encoding.GetByteCount(boundary));
                 }
    
 
                 sb = null;
-                
+                return multiPartPath;
             });
         }
-        //string fileToUpload, string fieldName, string fileName, string filePath,
-        /*async Task SaveToFileSystemAsync(UploadFileItemInfo[] filesToUpload, IDictionary<string, string> parameters = null)
-        {
 
-            if (File.Exists(fileToUpload))
-            {
-                await Task.Run(async() =>
-                {
-                    // Write file to BodyPart
-                    var fileBytes = File.ReadAllBytes(fileToUpload);
-
-
-                    await SaveToFileSystemAsync(filesToUpload, parameters);
-
-					// Delete temporal file
-					if (File.Exists(fileToUpload))
-						File.Delete(fileToUpload);
-                });
-
-
-
-            }
-            else
-            {
-                Console.WriteLine("Upload file doesn't exist. File: {0}", filePath);
-            }
-        }*/
-
-        NSUrlSessionConfiguration CreateSessionConfiguration(IDictionary<string, string> headers, string identifier)
+        NSUrlSessionConfiguration CreateSessionConfiguration(IDictionary<string, string> headers, string identifier,string boundary)
         {
             var sessionConfiguration = NSUrlSessionConfiguration.CreateBackgroundSessionConfiguration(identifier);
 
             var headerDictionary = new NSMutableDictionary();
             headerDictionary.Add(new NSString("Accept"), new NSString("application/json"));
-            headerDictionary.Add(new NSString("Content-Type"), new NSString(string.Format("multipart/form-data; boundary={0}", partBoundary)));
+            headerDictionary.Add(new NSString("Content-Type"), new NSString(string.Format("multipart/form-data; boundary={0}", boundary)));
 
 
             if (headers != null)
@@ -375,21 +347,21 @@ namespace Plugin.FileUploader
             return sessionConfiguration;
         }
 
-        async Task<FileUploadResponse> MakeRequest(string url, IDictionary<string, string> headers)
+        async Task<FileUploadResponse> MakeRequest(string uploadPath,string tag, string url, IDictionary<string, string> headers,string boundary)
         {
             var request = new NSMutableUrlRequest(NSUrl.FromString(url));
             request.HttpMethod = "POST";
             request["Accept"] = "*/*";
-            request["Content-Type"] = "multipart/form-data; boundary=" + partBoundary;
+            request["Content-Type"] = "multipart/form-data; boundary=" + boundary;
             uploadCompletionSource = new TaskCompletionSource<FileUploadResponse>();
 
-            var sessionConfiguration = CreateSessionConfiguration(headers, $"{SessionId}{multiPartPath}");
+            var sessionConfiguration = CreateSessionConfiguration(headers, $"{SessionId}{uploadPath}",boundary);
 
             var session = NSUrlSession.FromConfiguration(sessionConfiguration, (INSUrlSessionDelegate)this, NSOperationQueue.MainQueue);
 
-            var uploadTask = session.CreateUploadTask(request, new NSUrl(multiPartPath, false));
-
-            uploadTask.TaskDescription = multiPartPath;
+            var uploadTask = session.CreateUploadTask(request, new NSUrl(uploadPath, false));
+        
+            uploadTask.TaskDescription = $"{tag}|{uploadPath}";
             uploadTask.Priority = NSUrlSessionTaskPriority.High;
             uploadTask.Resume();
 
@@ -403,11 +375,25 @@ namespace Plugin.FileUploader
         public override void DidCompleteWithError(NSUrlSession session, NSUrlSessionTask task, NSError error)
         {
             Console.WriteLine(string.Format("DidCompleteWithError TaskId: {0}{1}", task.TaskIdentifier, (error == null ? "" : " Error: " + error.Description)));
+            NSMutableData _data = null;
+
+            if (uploadData.ContainsKey(task.TaskIdentifier))
+            {
+                _data = uploadData[task.TaskIdentifier];
+                uploadData.Remove(task.TaskIdentifier);
+            }
+            else
+            {
+                _data = new NSMutableData();
+            }
 
             NSString dataString = NSString.FromData(_data, NSStringEncoding.UTF8);
             var message = dataString == null ? string.Empty : $"{dataString}";
             var responseError = false;
             NSHttpUrlResponse response = null;
+
+            string[] parts=task.TaskDescription.Split('|');
+
             if (task.Response is NSHttpUrlResponse)
             {
                 response = task.Response as NSHttpUrlResponse;
@@ -419,38 +405,51 @@ namespace Plugin.FileUploader
             System.Diagnostics.Debug.WriteLine("COMPLETE");
 
 			//Remove the temporal multipart file
-			if (File.Exists(multiPartPath))
+			if (parts != null && parts.Length > 0 && File.Exists(parts[1]))
 			{
-				File.Delete(multiPartPath);
-			}
+				File.Delete(parts[1]);
+            }
+
+            if (parts == null || parts.Length == 0)
+                parts = new string[] { string.Empty, string.Empty };
 
             if (error == null && !responseError)
             {
-                var fileUploadResponse = new FileUploadResponse(message, (int)response?.StatusCode,tag);
+                var fileUploadResponse = new FileUploadResponse(message, (int)response?.StatusCode, parts[0]);
                 uploadCompletionSource.SetResult(fileUploadResponse);
                 FileUploadCompleted(this, fileUploadResponse);
 
             }
             else if (responseError)
             {
-                var fileUploadResponse = new FileUploadResponse(message, (int)response?.StatusCode,tag);
+                var fileUploadResponse = new FileUploadResponse(message, (int)response?.StatusCode, parts[0]);
                 uploadCompletionSource.SetResult(fileUploadResponse);
                 FileUploadError(this, fileUploadResponse);
             }
             else
             {
-                var fileUploadResponse = new FileUploadResponse(error.Description, (int)response?.StatusCode,tag);
+                var fileUploadResponse = new FileUploadResponse(error.Description, (int)response?.StatusCode, parts[0]);
                 uploadCompletionSource.SetResult(fileUploadResponse);
                 FileUploadError(this, fileUploadResponse);
             }
-
-            _data = new NSMutableData();
+          
+            _data = null;
         }
 
         public override void DidReceiveData(NSUrlSession session, NSUrlSessionDataTask dataTask, NSData data)
         {
             System.Diagnostics.Debug.WriteLine("DidReceiveData...");
-            _data.AppendData(data);
+            if(uploadData.ContainsKey(dataTask.TaskIdentifier))
+            {
+                uploadData[dataTask.TaskIdentifier].AppendData(data);
+            }
+            else
+            {
+                var uData = new NSMutableData();
+                uData.AppendData(data);
+                uploadData.Add(dataTask.TaskIdentifier,uData);
+            }
+           // _data.AppendData(data);
         }
 
         public override void DidReceiveResponse(NSUrlSession session, NSUrlSessionDataTask dataTask, NSUrlResponse response, Action<NSUrlSessionResponseDisposition> completionHandler)
@@ -514,8 +513,7 @@ namespace Plugin.FileUploader
 				name = $"{bundleName}_{timestamp}.jpg";
 			}
 
-
-
+           
 			return Path.Combine(path, GetUniquePath(path, name));
 		}
 

@@ -29,9 +29,10 @@ namespace Plugin.FileUploader.Abstractions
         /// <param name="fileItem">File path item to be uploaded</param>
         /// <param name="headers">Request headers</param>
         /// <param name="parameters">Additional parameters for upload request</param>
+        /// <param name="boundary">Custom part boundary</param>
         /// <returns>FileUploadResponse</returns>
-        Task<FileUploadResponse> UploadFileAsync(string url, FilePathItem fileItem, IDictionary<string,string> headers =null,IDictionary < string, string> parameters = null);
-        
+        Task<FileUploadResponse> UploadFileAsync(string url, FilePathItem fileItem, IDictionary<string,string> headers =null,IDictionary < string, string> parameters = null, string boundary = null);
+
         /// <summary>
         /// Upload file using file path
         /// </summary>
@@ -40,8 +41,9 @@ namespace Plugin.FileUploader.Abstractions
         /// <param name="tag">Tag reference of the upload request</param>
         /// <param name="headers">Request headers</param>
         /// <param name="parameters">Additional parameters for upload request</param>
+        /// <param name="boundary">Custom part boundary</param>
         /// <returns>FileUploadResponse</returns>
-        Task<FileUploadResponse> UploadFileAsync(string url, FilePathItem[] fileItems,string tag, IDictionary<string, string> headers = null, IDictionary<string, string> parameters = null);
+        Task<FileUploadResponse> UploadFileAsync(string url, FilePathItem[] fileItems,string tag, IDictionary<string, string> headers = null, IDictionary<string, string> parameters = null, string boundary = null);
 
         /// <summary>
         /// Upload file using file bytes
@@ -50,8 +52,9 @@ namespace Plugin.FileUploader.Abstractions
         /// <param name="fileItem">File bytes item to be uploaded</param>
         /// <param name="headers">Request headers</param>
         /// <param name="parameters">Additional parameters for upload request</param>
+        /// <param name="boundary">Custom part boundary</param>
         /// <returns>FileUploadResponse</returns>
-        Task<FileUploadResponse> UploadFileAsync(string url, FileBytesItem fileItem, IDictionary<string, string> headers = null, IDictionary<string, string> parameters = null);
+        Task<FileUploadResponse> UploadFileAsync(string url, FileBytesItem fileItem, IDictionary<string, string> headers = null, IDictionary<string, string> parameters = null, string boundary = null);
 
 
         /// <summary>
@@ -62,7 +65,8 @@ namespace Plugin.FileUploader.Abstractions
         /// <param name="tag">Tag reference of upload request</param>
         /// <param name="headers">Request headers</param>
         /// <param name="parameters">Additional parameters for upload request</param>
+        /// <param name="boundary">Custom part boundary</param>
         /// <returns>FileUploadResponse</returns>
-        Task<FileUploadResponse> UploadFileAsync(string url, FileBytesItem[] fileItems,string tag, IDictionary<string, string> headers = null, IDictionary<string, string> parameters = null);
+        Task<FileUploadResponse> UploadFileAsync(string url, FileBytesItem[] fileItems,string tag, IDictionary<string, string> headers = null, IDictionary<string, string> parameters = null,string boundary = null);
     }
 }
