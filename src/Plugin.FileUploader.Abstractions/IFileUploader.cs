@@ -34,7 +34,7 @@ namespace Plugin.FileUploader.Abstractions
         Task<FileUploadResponse> UploadFileAsync(string url, FilePathItem fileItem, IDictionary<string,string> headers =null,IDictionary < string, string> parameters = null, string boundary = null);
 
         /// <summary>
-        /// Upload file using file path
+        /// Upload files using file path
         /// </summary>
         /// <param name="url">Url for file uploading</param>
         /// <param name="fileItems">File path items to be uploaded</param>
@@ -58,7 +58,7 @@ namespace Plugin.FileUploader.Abstractions
 
 
         /// <summary>
-        /// Upload file using file bytes
+        /// Upload files using file bytes
         /// </summary>
         /// <param name="url">Url for file uploading</param>
         /// <param name="fileItems">File bytes of items to be uploaded</param>
