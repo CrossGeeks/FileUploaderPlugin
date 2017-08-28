@@ -12,6 +12,7 @@ Simple cross platform plugin for file multipart uploads.
 - Upload multiple files at once
 - Upload request progress feedback
 - Upload files by using bytes or file path
+- Set custom boundary
 
 ### Setup
 * Available on NuGet: http://www.nuget.org/packages/Plugin.FileUploader [![NuGet](https://img.shields.io/nuget/v/Plugin.FileUploader.svg?label=NuGet)](https://www.nuget.org/packages/Plugin.FileUploader/)
