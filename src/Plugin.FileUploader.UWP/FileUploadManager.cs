@@ -65,7 +65,7 @@ namespace Plugin.FileUploader
             }
             else
             {
-                upload = await uploader.CreateUploadAsync(uri, parts, "multipart/related", boundary);
+                upload = await uploader.CreateUploadAsync(uri, parts, "related", boundary);
             }
 
             return await HandleUploadAsync(upload, true);
@@ -149,7 +149,7 @@ namespace Plugin.FileUploader
             }
             else
             {
-                upload = await uploader.CreateUploadAsync(uri, parts, "multipart/related", boundary);
+                upload = await uploader.CreateUploadAsync(uri, parts, "related", boundary);
             }
 
             return await HandleUploadAsync(upload, true);

@@ -297,8 +297,8 @@ namespace Plugin.FileUploader
                            
                             fileInfo.Data = null;
                         }
-                        
-                    writeStream.Write(encoding.GetBytes($"\r\n--{boundary}--\r\n"), 0, encoding.GetByteCount(boundary));
+                    var pBoundary = $"\r\n--{boundary}--\r\n";
+                    writeStream.Write(encoding.GetBytes(pBoundary), 0, encoding.GetByteCount(pBoundary));
                 }
    
 
@@ -502,9 +502,12 @@ namespace Plugin.FileUploader
 
 		string GetOutputPath(string directoryName, string bundleName, string name)
 		{
-
-			var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), directoryName);
-			Directory.CreateDirectory(path);
+#if __MAC__
+            var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), directoryName);
+#else
+            var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), directoryName);
+#endif
+            Directory.CreateDirectory(path);
 
 			if (string.IsNullOrWhiteSpace(name))
 			{
