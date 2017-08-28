@@ -1,6 +1,8 @@
 ﻿{
   "dependencies": {
-    "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
+    "Microsoft.NETCore.UniversalWindowsPlatform": "5.3.3",
+    "Plugin.FileUploader": "1.3.0-beta",
+    "Xam.Plugin.Media": "3.0.2-beta82",
     "Xamarin.Forms": "2.3.4.224"
   },
   "frameworks": {

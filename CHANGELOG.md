@@ -14,7 +14,7 @@
 ### 1.1.2
 * Tag bug fix
 
-### 1.2.0
+### 1.3.0
 * [UWP] support
 * [macOS] support
 * [tvOS] support
