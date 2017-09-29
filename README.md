@@ -234,6 +234,24 @@ On AppDelegate.cs
 
 Also consider on iOS 9+, your URL must be secured or you have to add the domain to the list of exceptions. See https://github.com/codepath/ios_guides/wiki/App-Transport-Security
 
+### Android:
+
+There are some android specific static properties to specify timeout information:
+
+```csharp
+        public static TimeUnit UploadTimeoutUnit { get; set; } = TimeUnit.Minutes;
+        public static long SocketUploadTimeout { get; set; } = 5;
+        public static long ConnectUploadTimeout { get; set; } = 5;
+``` 
+
+Above you can see the default values. But you can change the value for the timeouts and unit by setting it from your Android project(Could be on MainActivity) like this:
+
+```csharp
+        FileUploadManager.UploadTimeoutUnit = TimeUnit.Minutes;
+        FileUploadManager.SocketUploadTimeout = 10;
+        FileUploadManager.ConnectUploadTimeout  = 5;
+``` 
+
 
 #### Contributors
 
