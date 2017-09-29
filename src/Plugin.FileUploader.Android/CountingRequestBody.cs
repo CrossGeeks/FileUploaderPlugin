@@ -18,12 +18,13 @@ namespace Plugin.FileUploader
     {
         protected RequestBody _body;
         protected ICountProgressListener _listener;
-
+        protected string _tag;
         protected CountingSink countingSink;
 
-        public CountingRequestBody(RequestBody body, ICountProgressListener listener)
+        public CountingRequestBody(RequestBody body, string tag, ICountProgressListener listener)
         {
             _body = body;
+            _tag = tag;
             _listener = listener;
         }
         public override MediaType ContentType()
@@ -37,14 +38,23 @@ namespace Plugin.FileUploader
 
         public override void WriteTo(OkHttp.Okio.IBufferedSink p0)
         {
-            IBufferedSink bufferedSink;
 
-            countingSink = new CountingSink(this, p0);
-            bufferedSink = Okio.Buffer(countingSink);
+            try
+            {
+                IBufferedSink bufferedSink;
+                countingSink = new CountingSink(this, p0);
+                bufferedSink = Okio.Buffer(countingSink);
 
-            _body.WriteTo(bufferedSink);
+                _body.WriteTo(bufferedSink);
 
-            bufferedSink.Flush();
+                bufferedSink.Flush();
+            }
+            catch(Java.IO.IOException ex)
+            {
+                _listener?.OnError(_tag,ex.ToString());
+            }
+           
+         
         }
 
         public class CountingSink : ForwardingSink
@@ -59,10 +69,18 @@ namespace Plugin.FileUploader
 
             public override void Write(OkBuffer p0, long p1)
             {
-                base.Write(p0, p1);
+                try
+                {
+                    base.Write(p0, p1);
 
-                bytesWritten += p1;
-                _parent?._listener.OnProgress(bytesWritten, _parent.ContentLength());
+                    bytesWritten += p1;
+                    _parent?._listener.OnProgress(bytesWritten, _parent.ContentLength());
+                }
+                catch (Java.IO.IOException ex)
+                {
+                    _parent?._listener?.OnError(_parent._tag, ex.ToString());
+                }
+       
             }
 
 

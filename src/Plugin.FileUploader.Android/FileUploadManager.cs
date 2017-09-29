@@ -13,6 +13,11 @@ namespace Plugin.FileUploader
     /// </summary>
     public class FileUploadManager : IFileUploader, ICountProgressListener
     {
+        public static TimeUnit UploadTimeoutUnit { get; set; } = TimeUnit.Minutes;
+        public static long SocketUploadTimeout { get; set; } = 5;
+        public static long ConnectUploadTimeout { get; set; } = 5;
+
+        TaskCompletionSource<FileUploadResponse> uploadCompletionSource;
         public event EventHandler<FileUploadResponse> FileUploadCompleted = delegate { };
         public event EventHandler<FileUploadResponse> FileUploadError = delegate { };
         public event EventHandler<FileUploadProgress> FileUploadProgress = delegate { };
@@ -23,14 +28,18 @@ namespace Plugin.FileUploader
         }
         public async Task<FileUploadResponse> UploadFileAsync(string url, FileBytesItem[] fileItems,string tag, IDictionary<string, string> headers = null, IDictionary<string, string> parameters = null, string boundary = null)
         {
+
+            uploadCompletionSource = new TaskCompletionSource<FileUploadResponse>();
+
             if (fileItems == null || fileItems.Length == 0)
             {
                 var fileUploadResponse = new FileUploadResponse("There are no items to upload", -1, tag);
                 FileUploadError(this, fileUploadResponse);
-                return fileUploadResponse;
+
+                uploadCompletionSource.SetResult(fileUploadResponse);
             }
                 
-            return await Task.Run(() =>
+            Task.Run(() =>
             {
                 try
                 {
@@ -47,8 +56,13 @@ namespace Plugin.FileUploader
                         RequestBody fileBody = RequestBody.Create(mediaType, fileItem.Bytes);
                         requestBodyBuilder.AddFormDataPart(fileItem.FieldName, fileItem.Name, fileBody);
                     }
-                   
-                    return MakeRequest(url, tag, requestBodyBuilder, headers);
+
+                    var resp = MakeRequest(url, tag, requestBodyBuilder, headers);
+
+                    if (!uploadCompletionSource.Task.IsCompleted)
+                    {
+                        uploadCompletionSource.SetResult(resp);
+                    }
 
                 }
                 catch (Java.Net.UnknownHostException ex)
@@ -56,25 +70,28 @@ namespace Plugin.FileUploader
                     var fileUploadResponse = new FileUploadResponse("Host not reachable", -1, tag);
                     FileUploadError(this, fileUploadResponse);
                     System.Diagnostics.Debug.WriteLine(ex.ToString());
-                    return fileUploadResponse;
+                    uploadCompletionSource.SetResult(fileUploadResponse);
                 }
                 catch (Java.IO.IOException ex)
                 {
                     var fileUploadResponse = new FileUploadResponse(ex.ToString(), -1,tag);
                     FileUploadError(this, fileUploadResponse);
                     System.Diagnostics.Debug.WriteLine(ex.ToString());
-                    return fileUploadResponse;
+                    uploadCompletionSource.SetResult(fileUploadResponse);
                 }
                 catch (Exception ex)
                 {
                     var fileUploadResponse = new FileUploadResponse(ex.ToString(), -1, tag);
                     FileUploadError(this, fileUploadResponse);
                     System.Diagnostics.Debug.WriteLine(ex.ToString());
-                    return fileUploadResponse;
+                    uploadCompletionSource.SetResult(fileUploadResponse);
                 }
 
 
             });
+
+            
+            return await uploadCompletionSource.Task;
         }
         string GetMimeType(string url)
         {
@@ -101,14 +118,17 @@ namespace Plugin.FileUploader
         }
         public async Task<FileUploadResponse> UploadFileAsync(string url, FilePathItem[] fileItems,string tag, IDictionary<string, string> headers = null, IDictionary<string, string> parameters = null, string boundary = null)
         {
+
+            uploadCompletionSource = new TaskCompletionSource<FileUploadResponse>();
+
             if (fileItems == null || fileItems.Length == 0)
             {
                 var fileUploadResponse = new FileUploadResponse("There are no items to upload", -1, tag);
                 FileUploadError(this, fileUploadResponse);
-                return fileUploadResponse;
+                uploadCompletionSource.SetResult(fileUploadResponse);
             }
 
-            return await Task.Run(() =>
+            Task.Run(() =>
             {
                 try
                 {
@@ -125,30 +145,38 @@ namespace Plugin.FileUploader
                         requestBodyBuilder.AddFormDataPart(fileItem.FieldName, fileName, file_body);
                     }
 
-                    return MakeRequest(url,tag,requestBodyBuilder,headers);
+                    var resp=MakeRequest(url, tag, requestBodyBuilder, headers);
+
+                    if (!uploadCompletionSource.Task.IsCompleted)
+                    {
+                        uploadCompletionSource.SetResult(resp);
+                    }
+              
                 }
                 catch (Java.Net.UnknownHostException ex)
                 {
                     var fileUploadResponse = new FileUploadResponse("Host not reachable", -1,tag);
                     FileUploadError(this, fileUploadResponse);
                     System.Diagnostics.Debug.WriteLine(ex.ToString());
-                    return fileUploadResponse;
+                    uploadCompletionSource.SetResult(fileUploadResponse);
                 }
                 catch (Java.IO.IOException ex)
                 {
                     var fileUploadResponse = new FileUploadResponse(ex.ToString(), -1, tag);
                     FileUploadError(this, fileUploadResponse);
                     System.Diagnostics.Debug.WriteLine(ex.ToString());
-                    return fileUploadResponse;
+                    uploadCompletionSource.SetResult(fileUploadResponse);
                 }
                 catch (Exception ex)
                 {
                     var fileUploadResponse = new FileUploadResponse(ex.ToString(), -1, tag);
                     FileUploadError(this, fileUploadResponse);
                     System.Diagnostics.Debug.WriteLine(ex.ToString());
-                    return fileUploadResponse;
+                    uploadCompletionSource.SetResult(fileUploadResponse);
                 }
             });
+
+            return await uploadCompletionSource.Task;
         }
 
 
@@ -182,7 +210,7 @@ namespace Plugin.FileUploader
         FileUploadResponse MakeRequest(string url,string tag,  MultipartBuilder requestBodyBuilder, IDictionary<string, string> headers = null)
         {
             //RequestBody requestBody = requestBodyBuilder.Build();
-            CountingRequestBody requestBody = new CountingRequestBody(requestBodyBuilder.Build(),this);
+            CountingRequestBody requestBody = new CountingRequestBody(requestBodyBuilder.Build(),tag,this);
             var requestBuilder = new Request.Builder();
 
             if (headers != null)
@@ -202,8 +230,8 @@ namespace Plugin.FileUploader
                 .Build();
 
             OkHttpClient client = new OkHttpClient();
-            client.SetConnectTimeout(5, TimeUnit.Minutes); // connect timeout
-            client.SetReadTimeout(5, TimeUnit.Minutes);    // socket timeout
+            client.SetConnectTimeout(ConnectUploadTimeout, UploadTimeoutUnit); // connect timeout
+            client.SetReadTimeout(SocketUploadTimeout, UploadTimeoutUnit);    // socket timeout
 
             Response response = client.NewCall(request).Execute();
             var responseString = response.Body().String();
@@ -228,6 +256,16 @@ namespace Plugin.FileUploader
         {
             var fileUploadProgress = new FileUploadProgress(bytesWritten, contentLength);
             FileUploadProgress(this, fileUploadProgress);
+        }
+
+        public void OnError(string tag,string error)
+        {
+            var fileUploadResponse = new FileUploadResponse(error, -1, tag);
+            FileUploadError(this, fileUploadResponse);
+            System.Diagnostics.Debug.WriteLine(error);
+           
+
+            uploadCompletionSource.SetResult(fileUploadResponse);
         }
     }
 }

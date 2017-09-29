@@ -15,5 +15,6 @@ namespace Plugin.FileUploader
     public interface ICountProgressListener
     {
         void OnProgress(long bytesWritten, long contentLength);
+        void OnError(string tag,string error);
     }
 }
