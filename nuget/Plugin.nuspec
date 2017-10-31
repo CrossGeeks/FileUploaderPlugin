@@ -2,7 +2,7 @@
 <package >
   <metadata minClientVersion="2.8.1">
     <id>Plugin.FileUploader</id>
-    <version>1.3.4</version>
+    <version>1.3.5</version>
     <title>File Uploader Plugin for Xamarin and Windows</title>
     <authors>Rendy Del Rosario</authors>
     <owners>crossgeeks</owners>
@@ -34,7 +34,7 @@
       <group targetFramework="xamarinwatchos">
       </group>
     </dependencies>
-    <releaseNotes>UWP, Mac, tvOS and watchOS support</releaseNotes>
+    <releaseNotes>Bug fix when working on setting task result more than once</releaseNotes>
   </metadata>
   <files>
         <!--NetStandard/PCL-->

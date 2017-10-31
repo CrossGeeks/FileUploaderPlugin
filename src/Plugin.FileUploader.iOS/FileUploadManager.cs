@@ -413,23 +413,24 @@ namespace Plugin.FileUploader
             if (parts == null || parts.Length == 0)
                 parts = new string[] { string.Empty, string.Empty };
 
+
             if (error == null && !responseError)
             {
                 var fileUploadResponse = new FileUploadResponse(message, (int)response?.StatusCode, parts[0]);
-                uploadCompletionSource.SetResult(fileUploadResponse);
+                uploadCompletionSource.TrySetResult(fileUploadResponse);
                 FileUploadCompleted(this, fileUploadResponse);
 
             }
             else if (responseError)
             {
                 var fileUploadResponse = new FileUploadResponse(message, (int)response?.StatusCode, parts[0]);
-                uploadCompletionSource.SetResult(fileUploadResponse);
+                uploadCompletionSource.TrySetResult(fileUploadResponse);
                 FileUploadError(this, fileUploadResponse);
             }
             else
             {
                 var fileUploadResponse = new FileUploadResponse(error.Description, (int)response?.StatusCode, parts[0]);
-                uploadCompletionSource.SetResult(fileUploadResponse);
+                uploadCompletionSource.TrySetResult(fileUploadResponse);
                 FileUploadError(this, fileUploadResponse);
             }
           
