@@ -260,9 +260,9 @@ namespace Plugin.FileUploader
             }
         }
 
-        public void OnProgress(long bytesWritten, long contentLength)
+        public void OnProgress(string tag,long bytesWritten, long contentLength)
         {
-            var fileUploadProgress = new FileUploadProgress(bytesWritten, contentLength);
+            var fileUploadProgress = new FileUploadProgress(bytesWritten, contentLength,tag);
             FileUploadProgress(this, fileUploadProgress);
         }
 

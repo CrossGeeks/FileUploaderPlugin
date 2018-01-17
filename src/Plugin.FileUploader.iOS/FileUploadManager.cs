@@ -493,7 +493,16 @@ namespace Plugin.FileUploader
 
         public override void DidSendBodyData(NSUrlSession session, NSUrlSessionTask task, long bytesSent, long totalBytesSent, long totalBytesExpectedToSend)
         {
-            var fileUploadProgress = new FileUploadProgress(totalBytesSent,totalBytesExpectedToSend);
+            string[] parts = task.TaskDescription.Split('|');
+
+            var tag = string.Empty;
+
+            if (parts != null && parts.Length > 0)
+            {
+                tag = parts[0];
+            }
+
+            var fileUploadProgress = new FileUploadProgress(totalBytesSent,totalBytesExpectedToSend,tag);
             FileUploadProgress(this, fileUploadProgress);
 
             System.Diagnostics.Debug.WriteLine(string.Format("DidSendBodyData bSent: {0}, totalBSent: {1} totalExpectedToSend: {2}", bytesSent, totalBytesSent, totalBytesExpectedToSend));

@@ -74,7 +74,7 @@ namespace Plugin.FileUploader
                     base.Write(p0, p1);
 
                     bytesWritten += p1;
-                    _parent?._listener.OnProgress(bytesWritten, _parent.ContentLength());
+                    _parent?._listener.OnProgress(_parent._tag,bytesWritten, _parent.ContentLength());
                 }
                 catch (Java.IO.IOException ex)
                 {

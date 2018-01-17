@@ -311,7 +311,7 @@ namespace Plugin.FileUploader
                 percentSent = currentProgress.BytesSent * 100 / currentProgress.TotalBytesToSend;
             }
 
-            var fileUploadProgress = new FileUploadProgress((long)currentProgress.BytesSent, (long)currentProgress.TotalBytesToSend);
+            var fileUploadProgress = new FileUploadProgress((long)currentProgress.BytesSent, (long)currentProgress.TotalBytesToSend, upload.TransferGroup.Name);
             FileUploadProgress(this, fileUploadProgress);
 
             if (currentProgress.HasRestarted)

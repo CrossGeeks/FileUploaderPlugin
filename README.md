@@ -205,6 +205,7 @@ public class FileUploadProgress
         public long TotalBytesSent { get; }
         public long TotalLength { get; }
         public double Percentage { get; }
+		public string Tag { get; }
 
 }
 ```
@@ -213,7 +214,7 @@ Usage sample:
 ```csharp
   CrossFileUploader.Current.FileUploadProgress += (sender, uploadProgress) =>
   {
-      System.Diagnostics.Debug.WriteLine($"{uploadProgress.TotalBytesSent} - {uploadProgress.Percentage}");
+      System.Diagnostics.Debug.WriteLine($"{uploadProgress.Tag} - {uploadProgress.TotalBytesSent} - {uploadProgress.Percentage}");
   };
 ```
 ### **IMPORTANT**
