@@ -205,7 +205,7 @@ public class FileUploadProgress
         public long TotalBytesSent { get; }
         public long TotalLength { get; }
         public double Percentage { get; }
-		public string Tag { get; }
+	public string Tag { get; }
 
 }
 ```
