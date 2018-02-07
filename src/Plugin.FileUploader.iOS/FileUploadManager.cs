@@ -7,6 +7,7 @@ using MobileCoreServices;
 using Plugin.FileUploader.Abstractions;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -145,7 +146,7 @@ namespace Plugin.FileUploader
         {
             if (fileItems == null || fileItems.Length == 0)
             {
-                var fileUploadResponse = new FileUploadResponse("There are no items to upload", -1, tag);
+                var fileUploadResponse = new FileUploadResponse("There are no items to upload", -1, tag,null);
                 FileUploadError(this, fileUploadResponse);
                 return fileUploadResponse;
             }
@@ -187,7 +188,7 @@ namespace Plugin.FileUploader
 
             if(error)
             {
-                var fileUploadResponse = new FileUploadResponse(errorMessage, -1, tag);
+                var fileUploadResponse = new FileUploadResponse(errorMessage, -1, tag, null);
                 FileUploadError(this, fileUploadResponse);
                 return fileUploadResponse;
             }
@@ -401,7 +402,7 @@ namespace Plugin.FileUploader
                 Console.WriteLine("HTTP Status {0}", response.StatusCode);
                 responseError = response.StatusCode != 200 && response.StatusCode != 201;
             }
-
+           
             System.Diagnostics.Debug.WriteLine("COMPLETE");
 
 			//Remove the temporal multipart file
@@ -413,23 +414,36 @@ namespace Plugin.FileUploader
             if (parts == null || parts.Length == 0)
                 parts = new string[] { string.Empty, string.Empty };
 
+            IDictionary<string, string> responseHeaders = new Dictionary<string, string>();
+            var rHeaders = response.AllHeaderFields;
+            if (rHeaders != null)
+            {
+                foreach (var rHeader in rHeaders)
+                {
+                    if (!string.IsNullOrEmpty($"{rHeader.Value}"))
+                    {
+                        responseHeaders.Add($"{rHeader.Key}", $"{rHeader.Value}");
+                    }
+                }
+            }
 
             if (error == null && !responseError)
             {
-                var fileUploadResponse = new FileUploadResponse(message, (int)response?.StatusCode, parts[0]);
+              
+                var fileUploadResponse = new FileUploadResponse(message, (int)response?.StatusCode, parts[0], new ReadOnlyDictionary<string, string>(responseHeaders));
                 uploadCompletionSource.TrySetResult(fileUploadResponse);
                 FileUploadCompleted(this, fileUploadResponse);
 
             }
             else if (responseError)
             {
-                var fileUploadResponse = new FileUploadResponse(message, (int)response?.StatusCode, parts[0]);
+                var fileUploadResponse = new FileUploadResponse(message, (int)response?.StatusCode, parts[0], new ReadOnlyDictionary<string, string>(responseHeaders));
                 uploadCompletionSource.TrySetResult(fileUploadResponse);
                 FileUploadError(this, fileUploadResponse);
             }
             else
             {
-                var fileUploadResponse = new FileUploadResponse(error.Description, (int)response?.StatusCode, parts[0]);
+                var fileUploadResponse = new FileUploadResponse(error.Description, (int)response?.StatusCode, parts[0], new ReadOnlyDictionary<string, string>(responseHeaders));
                 uploadCompletionSource.TrySetResult(fileUploadResponse);
                 FileUploadError(this, fileUploadResponse);
             }

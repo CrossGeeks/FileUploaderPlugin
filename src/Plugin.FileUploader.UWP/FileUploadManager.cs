@@ -34,7 +34,7 @@ namespace Plugin.FileUploader
         {
             if (fileItems == null || fileItems.Length == 0)
             {
-                var fileUploadResponse = new FileUploadResponse("There are no items to upload", -1, tag);
+                var fileUploadResponse = new FileUploadResponse("There are no items to upload", -1, tag, null);
                 FileUploadError(this, fileUploadResponse);
                 return fileUploadResponse;
             }
@@ -42,7 +42,7 @@ namespace Plugin.FileUploader
             Uri uri;
             if (!Uri.TryCreate(url.Trim(), UriKind.Absolute, out uri))
             {
-                var fileUploadResponse = new FileUploadResponse("Invalid upload url", -1, tag);
+                var fileUploadResponse = new FileUploadResponse("Invalid upload url", -1, tag, null);
                 FileUploadError(this, fileUploadResponse);
                 return fileUploadResponse;
             }
@@ -118,7 +118,7 @@ namespace Plugin.FileUploader
         {
             if (fileItems == null || fileItems.Length == 0)
             {
-                var fileUploadResponse = new FileUploadResponse("There are no items to upload", -1, tag);
+                var fileUploadResponse = new FileUploadResponse("There are no items to upload", -1, tag, null);
                 FileUploadError(this, fileUploadResponse);
                 return fileUploadResponse;
             }
@@ -126,7 +126,7 @@ namespace Plugin.FileUploader
             Uri uri;
             if (!Uri.TryCreate(url.Trim(), UriKind.Absolute, out uri))
             {
-                var fileUploadResponse = new FileUploadResponse("Invalid upload url", -1, tag);
+                var fileUploadResponse = new FileUploadResponse("Invalid upload url", -1, tag, null);
                 FileUploadError(this, fileUploadResponse);
                 return fileUploadResponse;
             }
@@ -210,7 +210,7 @@ namespace Plugin.FileUploader
                 ResponseInformation responseInfo = upload.GetResponseInformation();
               
                 //Handle this response string.
-                fileUploadResponse = new FileUploadResponse(response, (int)responseInfo.StatusCode, upload.TransferGroup.Name);
+                fileUploadResponse = new FileUploadResponse(response, (int)responseInfo.StatusCode, upload.TransferGroup.Name, responseInfo.Headers);
                 if (responseInfo.StatusCode == 200 || responseInfo.StatusCode == 201)
                 {
                     FileUploadCompleted(this, fileUploadResponse);
@@ -225,14 +225,14 @@ namespace Plugin.FileUploader
             }
             catch (TaskCanceledException)
             {
-                fileUploadResponse = new FileUploadResponse("Upload canceled", -1, upload.TransferGroup.Name);
+                fileUploadResponse = new FileUploadResponse("Upload canceled", -1, upload.TransferGroup.Name,null);
                 FileUploadError(this, fileUploadResponse);
             }
             catch (Exception ex)
             {
                 if (!IsExceptionHandled("Error", ex, upload))
                 {
-                    fileUploadResponse = new FileUploadResponse(ex.ToString()+$" * {response}", -1, upload.TransferGroup.Name);
+                    fileUploadResponse = new FileUploadResponse(ex.ToString()+$" * {response}", -1, upload.TransferGroup.Name, null);
                     FileUploadError(this, fileUploadResponse);
                 }
             }finally
@@ -269,7 +269,7 @@ namespace Plugin.FileUploader
 
             if (upload == null)
             {
-                var fileUploadResponse = new FileUploadResponse(error.ToString(), -1, string.Empty);
+                var fileUploadResponse = new FileUploadResponse(error.ToString(), -1, string.Empty,null);
                 FileUploadError(this, fileUploadResponse);
             }
             else
@@ -290,7 +290,7 @@ namespace Plugin.FileUploader
                     response = error.ToString();
                 }
                 
-                var fileUploadResponse = new FileUploadResponse(response,(int) responseInfo.StatusCode, upload.TransferGroup.Name);
+                var fileUploadResponse = new FileUploadResponse(response,(int) responseInfo.StatusCode, upload.TransferGroup.Name, null);
                 FileUploadError(this, fileUploadResponse);
             }
 
@@ -343,7 +343,7 @@ namespace Plugin.FileUploader
             {
                 if (!IsExceptionHandled("Discovery error", ex))
                 {
-                    var fileUploadResponse = new FileUploadResponse(ex.ToString(), -1, string.Empty);
+                    var fileUploadResponse = new FileUploadResponse(ex.ToString(), -1, string.Empty, null);
                     FileUploadError(this, fileUploadResponse);
                 }
                 return;
