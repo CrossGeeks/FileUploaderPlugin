@@ -178,8 +178,10 @@ For events **FileUploadCompleted** and **FileUploadError** you will get a FileUp
 ```csharp
 public class FileUploadResponse
 {
+        public string Tag { get; }
         public string Message { get; }
         public int StatusCode { get; }
+        public IReadOnlyDictionary<string, string> Headers { get; }
 }
 ```
 

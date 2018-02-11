@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Android.Webkit;
+using System.Collections.ObjectModel;
 
 namespace Plugin.FileUploader
 {
@@ -33,7 +34,7 @@ namespace Plugin.FileUploader
 
             if (fileItems == null || fileItems.Length == 0)
             {
-                var fileUploadResponse = new FileUploadResponse("There are no items to upload", -1, tag);
+                var fileUploadResponse = new FileUploadResponse("There are no items to upload", -1, tag, null);
                 FileUploadError(this, fileUploadResponse);
 
                 uploadCompletionSource.TrySetResult(fileUploadResponse);
@@ -68,21 +69,21 @@ namespace Plugin.FileUploader
                     }
                     catch (Java.Net.UnknownHostException ex)
                     {
-                        var fileUploadResponse = new FileUploadResponse("Host not reachable", -1, tag);
+                        var fileUploadResponse = new FileUploadResponse("Host not reachable", -1, tag, null);
                         FileUploadError(this, fileUploadResponse);
                         System.Diagnostics.Debug.WriteLine(ex.ToString());
                         uploadCompletionSource.TrySetResult(fileUploadResponse);
                     }
                     catch (Java.IO.IOException ex)
                     {
-                        var fileUploadResponse = new FileUploadResponse(ex.ToString(), -1, tag);
+                        var fileUploadResponse = new FileUploadResponse(ex.ToString(), -1, tag, null);
                         FileUploadError(this, fileUploadResponse);
                         System.Diagnostics.Debug.WriteLine(ex.ToString());
                         uploadCompletionSource.TrySetResult(fileUploadResponse);
                     }
                     catch (Exception ex)
                     {
-                        var fileUploadResponse = new FileUploadResponse(ex.ToString(), -1, tag);
+                        var fileUploadResponse = new FileUploadResponse(ex.ToString(), -1, tag, null);
                         FileUploadError(this, fileUploadResponse);
                         System.Diagnostics.Debug.WriteLine(ex.ToString());
                         uploadCompletionSource.TrySetResult(fileUploadResponse);
@@ -127,7 +128,7 @@ namespace Plugin.FileUploader
 
             if (fileItems == null || fileItems.Length == 0)
             {
-                var fileUploadResponse = new FileUploadResponse("There are no items to upload", -1, tag);
+                var fileUploadResponse = new FileUploadResponse("There are no items to upload", -1, tag, null);
                 FileUploadError(this, fileUploadResponse);
                 uploadCompletionSource.TrySetResult(fileUploadResponse);
             }
@@ -160,21 +161,21 @@ namespace Plugin.FileUploader
                     }
                     catch (Java.Net.UnknownHostException ex)
                     {
-                        var fileUploadResponse = new FileUploadResponse("Host not reachable", -1, tag);
+                        var fileUploadResponse = new FileUploadResponse("Host not reachable", -1, tag, null);
                         FileUploadError(this, fileUploadResponse);
                         System.Diagnostics.Debug.WriteLine(ex.ToString());
                         uploadCompletionSource.TrySetResult(fileUploadResponse);
                     }
                     catch (Java.IO.IOException ex)
                     {
-                        var fileUploadResponse = new FileUploadResponse(ex.ToString(), -1, tag);
+                        var fileUploadResponse = new FileUploadResponse(ex.ToString(), -1, tag, null);
                         FileUploadError(this, fileUploadResponse);
                         System.Diagnostics.Debug.WriteLine(ex.ToString());
                         uploadCompletionSource.TrySetResult(fileUploadResponse);
                     }
                     catch (Exception ex)
                     {
-                        var fileUploadResponse = new FileUploadResponse(ex.ToString(), -1, tag);
+                        var fileUploadResponse = new FileUploadResponse(ex.ToString(), -1, tag, null);
                         FileUploadError(this, fileUploadResponse);
                         System.Diagnostics.Debug.WriteLine(ex.ToString());
                         uploadCompletionSource.TrySetResult(fileUploadResponse);
@@ -244,20 +245,38 @@ namespace Plugin.FileUploader
             Response response = client.NewCall(request).Execute();
             var responseString = response.Body().String();
             var code = response.Code();
-            var fileUploadResponse = new FileUploadResponse(responseString, code, tag);
+
+            IDictionary<string, string> responseHeaders = new Dictionary<string, string>();
+            var rHeaders = response.Headers();
+            if (rHeaders != null)
+            {
+                var names = rHeaders.Names();
+                foreach (string name in names)
+                {
+                    if (!string.IsNullOrEmpty(rHeaders.Get(name)))
+                    {
+                        responseHeaders.Add(name, rHeaders.Get(name));
+                    }
+                }
+            }
+
+            FileUploadResponse fileUploadResponse = new FileUploadResponse(responseString, code, tag, new ReadOnlyDictionary<string, string>(responseHeaders));
+
+           
             if (response.IsSuccessful)
             {
-
+                
+               
                 FileUploadCompleted(this, fileUploadResponse);
 
-                return fileUploadResponse;
             }
             else
             {
-
                 FileUploadError(this, fileUploadResponse);
-                return fileUploadResponse;
+               
             }
+
+            return fileUploadResponse;
         }
 
         public void OnProgress(string tag,long bytesWritten, long contentLength)
@@ -268,7 +287,7 @@ namespace Plugin.FileUploader
 
         public void OnError(string tag,string error)
         {
-            var fileUploadResponse = new FileUploadResponse(error, -1, tag);
+            var fileUploadResponse = new FileUploadResponse(error, -1, tag, null);
             FileUploadError(this, fileUploadResponse);
             System.Diagnostics.Debug.WriteLine(error);
            
